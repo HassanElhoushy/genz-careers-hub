@@ -101,15 +101,7 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-            {authed ? (
-              <Link
-                to={authedHome}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-4 py-2.5 text-center text-sm font-semibold bg-accent"
-              >
-                {authedLabel}
-              </Link>
-            ) : (
+            {!authed &&
               publicLinks.map((l) => (
                 <Link
                   key={l.to}
@@ -121,8 +113,7 @@ export function Navbar() {
                 >
                   {l.label}
                 </Link>
-              ))
-            )}
+              ))}
             {authed && (
               <button
                 onClick={handleSignOut}
