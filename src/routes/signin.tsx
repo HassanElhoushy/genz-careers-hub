@@ -17,10 +17,10 @@ import { sessionStore, useSession } from "@/hooks/use-session";
 export const Route = createFileRoute("/signin")({
   head: () => ({
     meta: [
-      { title: "Sign In — GenZ" },
-      { name: "description", content: "Sign in to track your GenZ application or manage the team." },
-      { property: "og:title", content: "Sign In — GenZ" },
-      { property: "og:description", content: "Applicant and admin sign-in for GenZ." },
+      { title: "Sign In — GenZ's" },
+      { name: "description", content: "Sign in to track your GenZ's application or manage the team." },
+      { property: "og:title", content: "Sign In — GenZ's" },
+      { property: "og:description", content: "Applicant and admin sign-in for GenZ's." },
       { property: "og:url", content: "/signin" },
     ],
     links: [{ rel: "canonical", href: "/signin" }],
@@ -120,7 +120,7 @@ function SignInPage() {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">GenZ</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">GenZ's</p>
             <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Sign In</h1>
             <p className="mt-3 text-sm text-muted-foreground">
               Welcome back. Sign in to see your application.

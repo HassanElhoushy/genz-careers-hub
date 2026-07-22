@@ -55,10 +55,10 @@ import type { Application, ApplicationStatus } from "@/types/application";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin — GenZ Applications" },
-      { name: "description", content: "Manage GenZ team applications." },
-      { property: "og:title", content: "Admin — GenZ Applications" },
-      { property: "og:description", content: "Review and manage GenZ applications." },
+      { title: "Admin — GenZ's Applications" },
+      { name: "description", content: "Manage GenZ's team applications." },
+      { property: "og:title", content: "Admin — GenZ's Applications" },
+      { property: "og:description", content: "Review and manage GenZ's applications." },
       { property: "og:url", content: "/admin" },
     ],
     links: [{ rel: "canonical", href: "/admin" }],
@@ -137,7 +137,7 @@ function AdminPage() {
           transition={{ duration: 0.5 }}
         >
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-            Admin · GenZ
+            Admin · GenZ's
           </p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">Applications</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -489,7 +489,7 @@ function EditDialog({
               <Input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. GenZ HQ, Park Mall, New Cairo"
+                placeholder="e.g. GenZ's HQ, Park Mall, New Cairo"
                 className="mt-1 rounded-xl"
               />
             </div>

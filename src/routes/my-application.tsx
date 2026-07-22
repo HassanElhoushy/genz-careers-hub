@@ -13,10 +13,10 @@ import { sessionStore, useSession } from "@/hooks/use-session";
 export const Route = createFileRoute("/my-application")({
   head: () => ({
     meta: [
-      { title: "My Application — GenZ" },
-      { name: "description", content: "Track the status of your GenZ application." },
-      { property: "og:title", content: "My Application — GenZ" },
-      { property: "og:description", content: "See the current status of your GenZ application." },
+      { title: "My Application — GenZ's" },
+      { name: "description", content: "Track the status of your GenZ's application." },
+      { property: "og:title", content: "My Application — GenZ's" },
+      { property: "og:description", content: "See the current status of your GenZ's application." },
       { property: "og:url", content: "/my-application" },
     ],
     links: [{ rel: "canonical", href: "/my-application" }],
