@@ -87,7 +87,7 @@ export function Navbar() {
           : "bg-transparent",
       )}
     >
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Left: logo */}
         <div className="flex items-center">
           <Link
@@ -107,23 +107,31 @@ export function Navbar() {
               <Link
                 to="/"
                 onClick={handleHomeClick}
-                activeOptions={{ exact: true }}
-                activeProps={{ className: "text-foreground bg-accent" }}
-                inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
-                className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  homeActive
+                    ? "text-foreground bg-accent"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
                 Home
               </Link>
               <a
                 href="/#about"
                 onClick={handleAboutClick}
-                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  aboutActive
+                    ? "text-foreground bg-accent"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
                 About Us
               </a>
             </>
           )}
         </nav>
+
 
         {/* Right */}
         <div className="flex items-center gap-2 justify-self-end">
