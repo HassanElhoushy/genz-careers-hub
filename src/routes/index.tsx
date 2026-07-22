@@ -16,22 +16,23 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Careers at GenZ's — Shape the Future of Local Fashion" },
+      { title: "Join the GenZ's Team — Careers at GenZ's" },
       {
         name: "description",
         content:
           "Join GenZ's, a destination for Egyptian local fashion. Explore roles bringing together fashion, creativity, community, and technology.",
       },
-      { property: "og:title", content: "Careers at GenZ's — Shape the Future of Local Fashion" },
+      { property: "og:title", content: "Join the GenZ's Team — Careers at GenZ's" },
       {
         property: "og:description",
         content:
-          "Build your career with GenZ's — a home for Egyptian local fashion, creators, and community.",
+          "Build your career with GenZ's, a home for Egyptian local fashion, creators, and community.",
       },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
+
   component: Index,
 });
 
@@ -83,11 +84,12 @@ function Index() {
               custom={1}
               className="mt-6 text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl md:text-7xl"
             >
-              Shape the Future of{" "}
+              Join the{" "}
               <span className="relative inline-block">
-                <span className="text-primary">Local Fashion</span>
+                <span className="text-primary">GenZ's Team</span>
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-primary/30" />
               </span>
+
             </motion.h1>
 
             <motion.p
@@ -137,26 +139,20 @@ function Index() {
               </h2>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
                 <p>
-                  GenZ's was created with one mission: to redefine fashion for the next
-                  generation.
+                  GenZ's was created to redefine fashion for the next generation.
                 </p>
                 <p>
-                  What began as a simple question about why people choose the clothes they
-                  wear has grown into one of Egypt's destinations for local fashion. We
-                  believe style is more than clothing — it is a way to express identity,
-                  creativity, and confidence.
+                  What started as a simple question about why we wear what we wear has
+                  grown into one of Egypt's destinations for local fashion. We see style
+                  as a way to express identity, creativity, and confidence.
                 </p>
                 <p>
-                  By bringing Egyptian local brands together in one place, GenZ's makes it
-                  easier for customers to discover distinctive, high-quality products
-                  while supporting local designers, creators, and manufacturers.
-                </p>
-                <p>
-                  Today, we continue to grow while staying connected to our roots through
-                  local manufacturing, meaningful partnerships, and a commitment to
-                  empowering young creators.
+                  By bringing Egyptian brands together in one place, we make it easier
+                  to discover distinctive, high-quality pieces while supporting local
+                  designers, creators, and manufacturers.
                 </p>
               </div>
+
             </motion.div>
 
             <div className="flex flex-col gap-5 lg:pt-16">

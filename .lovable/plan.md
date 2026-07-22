@@ -1,82 +1,37 @@
+## 1. Mobile navbar (`src/components/Navbar.tsx`)
 
-## Scope
+On phones the 3-column grid renders as `[logo] [empty center] [toggle + hamburger]`, which leaves an awkward gap and hides the Apply Now / Sign In CTAs entirely until the menu is opened. Fix:
 
-Update the public homepage, navbar, and footer to match the new GenZ's careers brief. No changes to auth flow, apply form, applicant portal, admin panel, or routes.
+- Use a plain flex row (`flex items-center justify-between`) on mobile, and promote to the 3-column grid at `md:` only.
+- Keep Apply Now / Sign In hidden on mobile (they live inside the hamburger menu, which is correct), so mobile shows: logo left, theme toggle + hamburger right — no empty center column.
 
-## 1. Brand name
+## 2. About Us active state (`src/components/Navbar.tsx`)
 
-Global rename of user-facing "GenZ" → "GenZ's" in: `Navbar`, `Footer`, `index.tsx` (hero + all sections), `__root.tsx` head/meta titles, `apply.tsx`, `signin.tsx`, `my-application.tsx`, `admin.tsx` page titles/headings. Logo `alt` becomes "GenZ's". Do NOT rename storage keys, code identifiers, file names, asset filenames, or the `/genz-logo.jpg` path.
+Currently "About Us" is a plain `<a href="/#about">`, so the router keeps the active style on "Home" even while viewing the About section. Fix:
 
-## 2. Navbar (`src/components/Navbar.tsx`)
+- Track active section with a small scroll listener that sets `activeSection` to `"about"` when `#about` is in view (top < 120px, bottom > 120px), otherwise `"home"`.
+- Apply the active styles (`text-foreground bg-accent`) to Home or About Us based on `activeSection`, and stop relying on `activeProps` for Home.
+- Same logic mirrored in the mobile menu items.
 
-Public (signed-out) desktop layout uses a 3-column grid so center nav is centered against the full navbar, not the remaining space:
+## 3. Restore previous hero (`src/routes/index.tsx`)
 
-```text
-[logo]        [Home  About Us]        [Apply Now (solid)  Sign In (outline)]
-```
+Revert the hero heading to **"Join the GenZ's Team"** (keep the highlighted-word treatment on "GenZ's Team"). Keep the current eyebrow ("CAREERS AT GENZ'S"), supporting paragraph, and single Apply Now button. Update the route `head()` title/og accordingly (e.g. `Join the GenZ's Team — Careers at GenZ's`).
 
-- Links: Home → `/`, About Us → `/#about`, Apply Now → `/apply`, Sign In → `/signin`.
-- Home behavior: if already on `/`, `scrollTo({ top: 0, behavior: 'smooth' })`; otherwise navigate to `/`.
-- About Us behavior: if on `/`, smooth-scroll to `#about`; otherwise navigate to `/#about` and let root-level hash handler scroll after mount.
-- Apply Now = existing primary solid button; Sign In = outline/ghost button.
-- Mobile menu: same 4 items, Apply Now visually prominent; auto-close on selection (already wired).
-- Authed navbar: unchanged (logo + theme toggle + Sign Out; no center link, per prior decision).
+## 4. About GenZ's section — shorter, no em dashes (`src/routes/index.tsx`)
 
-## 3. Root route (`src/routes/__root.tsx`)
+Rewrite the left column copy to be tighter and remove every `—`. Proposed 3 short paragraphs:
 
-Add a small hash-scroll effect: on route change / mount, if `location.hash` is present, scroll the target into view smoothly (respecting `prefers-reduced-motion`). Needed so `/#about` works from other pages.
+- "GenZ's was created to redefine fashion for the next generation."
+- "What started as a simple question about why we wear what we wear has grown into one of Egypt's destinations for local fashion. We see style as a way to express identity, creativity, and confidence."
+- "By bringing Egyptian brands together in one place, we make it easier to discover distinctive, high-quality pieces while supporting local designers, creators, and manufacturers."
 
-Add CSS: `html { scroll-behavior: smooth; }` gated by `@media (prefers-reduced-motion: no-preference)` in `src/styles.css`, and `scroll-margin-top` on the About section to clear the sticky header.
-
-## 4. Homepage (`src/routes/index.tsx`)
-
-New section order: Hero → About Us → Why Join Us → Ready to Join CTA. Delete the "What We Stand For" (Values) section entirely, including its `Lightbulb/Users/Heart/Award` imports.
-
-### Hero
-- Eyebrow: "CAREERS AT GENZ'S"
-- H1: "Shape the Future of Local Fashion"
-- Copy: new supporting paragraph from spec.
-- CTA: single "Apply Now" button → `/apply`. Remove Sign In button.
-
-### About Us (new `<section id="about" className="scroll-mt-24">`)
-- Two-column desktop, single-column mobile.
-- Left: eyebrow "ABOUT GENZ'S", H2 "Built for the Next Generation of Fashion", the 4-paragraph story broken into readable paragraphs.
-- Right: two stacked cards — "Our Mission" and "Our Vision" — reusing existing card styling from Why Join Us (border, rounded-2xl, bg-card, subtle green accent).
-- No invented stats.
-
-### Why Join Us
-- Update eyebrow/heading/subtext and the three card titles + bodies per spec.
-- Keep existing card layout; swap icons to relevant Lucide icons: `Sparkles` (Create Local Impact), `TrendingUp` (Grow With the Brand), `Lightbulb` (Bring Ideas to Life).
-
-### Ready to Join CTA
-- Update eyebrow/heading/copy per spec; keep single Apply Now button.
-
-### Head metadata
-- Update title/description/og to reference GenZ's and the new positioning.
-
-## 5. Footer (`src/components/Footer.tsx`)
-
-- Rename brand text to "GenZ's".
-- Quick Links: Home (`/`), About Us (`/#about`), Apply Now (`/apply`), Sign In (`/signin`).
-- Email already `mailto:`; Instagram/TikTok already `target="_blank" rel="noopener noreferrer"` — keep.
-
-## 6. Accessibility / polish
-
-- Visible focus rings on nav links and buttons (rely on existing `focus-visible` tokens; add where missing).
-- `aria-current` via `activeProps` on nav links.
-- Smooth scroll gated by reduced-motion.
-- `scroll-mt-24` on `#about` for sticky header offset.
+Also scrub em dashes from the Mission and Vision card bodies (replace with commas or periods) and from any other homepage copy.
 
 ## Files touched
 
-- `src/components/Navbar.tsx` — restructured public nav, About link, Home smooth-scroll.
-- `src/components/Footer.tsx` — GenZ's rename, updated links.
-- `src/components/Logo.tsx` — alt text.
-- `src/routes/index.tsx` — hero copy, remove Values section, add About section, update Why Join Us, update CTA, update head meta.
-- `src/routes/__root.tsx` — hash-scroll effect, title rename.
-- `src/routes/apply.tsx`, `src/routes/signin.tsx`, `src/routes/my-application.tsx`, `src/routes/admin.tsx` — user-facing "GenZ" → "GenZ's" in copy/titles only.
-- `src/styles.css` — reduced-motion smooth scroll rule.
+- `src/components/Navbar.tsx` — mobile layout + active-section tracking for Home / About Us.
+- `src/routes/index.tsx` — restored hero heading, updated head meta, shortened About copy, no `—`.
 
 ## Out of scope
 
-Auth, form logic, admin/applicant portal behavior, routing structure, design tokens, logo asset, storage schemas.
+Auth, admin, applicant portal, footer, styles.css, routes structure.
