@@ -61,7 +61,7 @@ export function Navbar() {
               activeOptions={{ exact: true }}
               activeProps={{ className: "text-foreground bg-accent" }}
               inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
-              className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+              className="min-w-[12rem] rounded-full px-10 py-2.5 text-center text-sm font-medium transition-colors hover:bg-accent"
             >
               {authedLabel}
             </Link>
