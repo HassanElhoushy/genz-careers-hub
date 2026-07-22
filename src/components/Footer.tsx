@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Mail, Music2 } from "lucide-react";
+import { Instagram, Mail, Music2 } from "lucide-react";
 import { Logo } from "./Logo";
+
+const INSTAGRAM_URL = "https://www.instagram.com/genz___s?igsh=NGRlY2h6YXFmcGNj";
+const TIKTOK_URL = "https://www.tiktok.com/@genz__s?_r=1&_t=ZS-98ESBIHt1Xj";
+const EMAIL = "contact@genz-s.com";
 
 export function Footer() {
   return (
@@ -28,20 +32,21 @@ export function Footer() {
         <div>
           <h4 className="text-sm font-semibold text-white">Contact</h4>
           <a
-            href="mailto:careers@genz.eg"
+            href={`mailto:${EMAIL}`}
             className="mt-4 inline-flex items-center gap-2 text-sm hover:text-white transition-colors"
           >
-            <Mail className="h-4 w-4" /> careers@genz.eg
+            <Mail className="h-4 w-4" /> {EMAIL}
           </a>
           <div className="mt-5 flex gap-3">
             {[
-              { Icon: Instagram, href: "#", label: "Instagram" },
-              { Icon: Facebook, href: "#", label: "Facebook" },
-              { Icon: Music2, href: "#", label: "TikTok" },
+              { Icon: Instagram, href: INSTAGRAM_URL, label: "Instagram" },
+              { Icon: Music2, href: TIKTOK_URL, label: "TikTok" },
             ].map(({ Icon, href, label }) => (
               <a
                 key={label}
                 href={href}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={label}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 transition-all hover:bg-white hover:text-[oklch(0.14_0.015_155)]"
               >
