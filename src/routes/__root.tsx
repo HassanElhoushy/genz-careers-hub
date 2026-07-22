@@ -78,13 +78,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "GenZ — Egyptian Streetwear Careers" },
+      { title: "GenZ's — Careers in Egyptian Local Fashion" },
       {
         name: "description",
         content:
-          "Join GenZ, one of Egypt's leading local fashion brands. Explore roles, apply online, and build your future with us.",
+          "Join GenZ's, a destination for Egyptian local fashion. Explore roles, apply online, and build your future with us.",
       },
-      { property: "og:site_name", content: "GenZ" },
+      { property: "og:site_name", content: "GenZ's" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

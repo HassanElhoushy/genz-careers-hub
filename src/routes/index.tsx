@@ -1,14 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
   Sparkles,
   TrendingUp,
-  Crown,
   Lightbulb,
-  Users,
-  Heart,
-  Award,
+  Target,
+  Compass,
 } from "lucide-react";
 import { SiteLayout } from "@/layouts/SiteLayout";
 import { BackgroundShapes } from "@/components/BackgroundShapes";
@@ -17,16 +16,17 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Join the GenZ Team — Careers at GenZ" },
+      { title: "Careers at GenZ's — Shape the Future of Local Fashion" },
       {
         name: "description",
         content:
-          "Build your future with one of Egypt's leading local streetwear brands. Explore roles and apply online.",
+          "Join GenZ's, a destination for Egyptian local fashion. Explore roles bringing together fashion, creativity, community, and technology.",
       },
-      { property: "og:title", content: "Join the GenZ Team — Careers at GenZ" },
+      { property: "og:title", content: "Careers at GenZ's — Shape the Future of Local Fashion" },
       {
         property: "og:description",
-        content: "Egyptian streetwear culture. Premium, minimal, made in Cairo.",
+        content:
+          "Build your career with GenZ's — a home for Egyptian local fashion, creators, and community.",
       },
       { property: "og:url", content: "/" },
     ],
@@ -45,6 +45,18 @@ const fadeUp = {
 };
 
 function Index() {
+  // Scroll to hash target on mount (for /#about arrivals)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash) {
+      const id = window.location.hash.slice(1);
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, []);
+
   return (
     <SiteLayout>
       {/* Hero */}
@@ -60,10 +72,10 @@ function Index() {
             <motion.span
               variants={fadeUp}
               custom={0}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium tracking-wide text-primary"
+              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              Now hiring in Cairo
+              Careers at GenZ's
             </motion.span>
 
             <motion.h1
@@ -71,12 +83,11 @@ function Index() {
               custom={1}
               className="mt-6 text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl md:text-7xl"
             >
-              Join the{" "}
+              Shape the Future of{" "}
               <span className="relative inline-block">
-                <span className="text-primary">GenZ</span>
+                <span className="text-primary">Local Fashion</span>
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-primary/30" />
-              </span>{" "}
-              Team
+              </span>
             </motion.h1>
 
             <motion.p
@@ -84,8 +95,9 @@ function Index() {
               custom={2}
               className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg"
             >
-              Build your future with one of Egypt's leading local fashion brands.
-              Design, create, and shape the next wave of streetwear culture.
+              Join a team bringing together fashion, creativity, community, and technology
+              to help Egyptian brands grow and give the next generation new ways to
+              express themselves.
             </motion.p>
 
             <motion.div
@@ -99,16 +111,86 @@ function Index() {
                   <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full px-7 border-foreground/15"
-              >
-                <Link to="/signin">Sign In</Link>
-              </Button>
             </motion.div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* About Us */}
+      <section
+        id="about"
+        className="scroll-mt-24 border-t border-border bg-muted/30"
+      >
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <p className="text-sm font-semibold uppercase tracking-widest text-primary">
+                About GenZ's
+              </p>
+              <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+                Built for the Next Generation of Fashion
+              </h2>
+              <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
+                <p>
+                  GenZ's was created with one mission: to redefine fashion for the next
+                  generation.
+                </p>
+                <p>
+                  What began as a simple question about why people choose the clothes they
+                  wear has grown into one of Egypt's destinations for local fashion. We
+                  believe style is more than clothing — it is a way to express identity,
+                  creativity, and confidence.
+                </p>
+                <p>
+                  By bringing Egyptian local brands together in one place, GenZ's makes it
+                  easier for customers to discover distinctive, high-quality products
+                  while supporting local designers, creators, and manufacturers.
+                </p>
+                <p>
+                  Today, we continue to grow while staying connected to our roots through
+                  local manufacturing, meaningful partnerships, and a commitment to
+                  empowering young creators.
+                </p>
+              </div>
+            </motion.div>
+
+            <div className="flex flex-col gap-5 lg:pt-16">
+              {[
+                {
+                  Icon: Target,
+                  title: "Our Mission",
+                  body: "To make high-quality local fashion more accessible, inspire self-expression, and support the growth of Egyptian brands.",
+                },
+                {
+                  Icon: Compass,
+                  title: "Our Vision",
+                  body: "To become a leading fashion destination for Gen Z across the Middle East, connecting people with brands that reflect their identity, creativity, and culture.",
+                },
+              ].map((c, i) => (
+                <motion.div
+                  key={c.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  className="rounded-2xl border border-border bg-card p-7 transition-all hover:border-primary/30 hover:shadow-[var(--shadow-soft)]"
+                >
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <c.Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 text-xl font-bold">{c.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {c.body}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -125,26 +207,30 @@ function Index() {
             Why Join Us
           </p>
           <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            More than a job. A culture.
+            Create Meaningful Work With Local Impact
           </h2>
+          <p className="mt-4 text-muted-foreground">
+            At GenZ's, your work contributes to a growing ecosystem of Egyptian brands,
+            creators, and fashion communities.
+          </p>
         </motion.div>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {[
             {
               Icon: Sparkles,
-              title: "Creative Culture",
-              body: "Work with designers, stylists, and creators who push Egyptian streetwear forward every day.",
+              title: "Create Local Impact",
+              body: "Help Egyptian brands and creators reach new audiences and grow within a platform built to support local talent.",
             },
             {
               Icon: TrendingUp,
-              title: "Career Growth",
-              body: "Real ownership from day one. Learn fast, ship fast, and grow into the role you want.",
+              title: "Grow With the Brand",
+              body: "Develop your skills while contributing to a fast-moving company working across fashion, retail, content, community, and technology.",
             },
             {
-              Icon: Crown,
-              title: "Premium Fashion Brand",
-              body: "Join a brand shaping how a generation dresses — from Cairo to the region.",
+              Icon: Lightbulb,
+              title: "Bring Ideas to Life",
+              body: "Work in a collaborative environment where creativity, individuality, ownership, and new ideas are encouraged.",
             },
           ].map((f, i) => (
             <motion.div
@@ -165,53 +251,7 @@ function Index() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-                Our Values
-              </p>
-              <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-                What we stand for.
-              </h2>
-              <p className="mt-4 max-w-md text-muted-foreground">
-                Four principles guide every collection, every hire, every decision.
-              </p>
-            </motion.div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { Icon: Lightbulb, title: "Innovation", body: "We prototype, iterate, and ship." },
-                { Icon: Users, title: "Teamwork", body: "Small teams, big trust, sharper output." },
-                { Icon: Heart, title: "Customer Experience", body: "Every stitch, every DM, treated with care." },
-                { Icon: Award, title: "Excellence", body: "Premium quality is the baseline, not the ceiling." },
-              ].map((v, i) => (
-                <motion.div
-                  key={v.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ delay: i * 0.08, duration: 0.5 }}
-                  className="rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30"
-                >
-                  <v.Icon className="h-5 w-5 text-primary" />
-                  <h3 className="mt-4 text-lg font-bold">{v.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{v.body}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
+      {/* Ready to Join CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-primary p-10 text-center text-primary-foreground sm:p-16">
           <div aria-hidden className="absolute inset-0 opacity-20">
@@ -221,9 +261,15 @@ function Index() {
             </svg>
           </div>
           <div className="relative">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-5xl">Ready to join?</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/80">
+              Ready to Join?
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-5xl">
+              Bring Your Ideas to GenZ's
+            </h2>
             <p className="mx-auto mt-4 max-w-md text-primary-foreground/80">
-              Applications take under two minutes. We reply within a week.
+              Explore our available roles and become part of a team shaping the future of
+              local fashion.
             </p>
             <Button
               asChild
