@@ -84,11 +84,12 @@ function Index() {
               custom={1}
               className="mt-6 text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl md:text-7xl"
             >
-              Shape the Future of{" "}
+              Join the{" "}
               <span className="relative inline-block">
-                <span className="text-primary">Local Fashion</span>
+                <span className="text-primary">GenZ's Team</span>
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-primary/30" />
               </span>
+
             </motion.h1>
 
             <motion.p
