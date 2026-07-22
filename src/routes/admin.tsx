@@ -387,6 +387,7 @@ function EditDialog({
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [locationUrl, setLocationUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [reason, setReason] = useState("");
 
@@ -395,6 +396,7 @@ function EditDialog({
     setDate(application.interview ? new Date(application.interview.date) : undefined);
     setTime(application.interview?.time ?? "");
     setLocation(application.interview?.location ?? "");
+    setLocationUrl(application.interview?.locationUrl ?? "");
     setNotes(application.interview?.notes ?? "");
     setReason(application.rejectionReason ?? "");
   }, [application]);
@@ -410,11 +412,17 @@ function EditDialog({
         toast.error("Fill in date, time, and location.");
         return;
       }
+      const url = locationUrl.trim();
+      if (url && !/^https?:\/\//i.test(url)) {
+        toast.error("Location URL must start with http:// or https://");
+        return;
+      }
       onSave(application.id, {
         interview: {
           date: date.toISOString(),
           time,
           location: location.trim(),
+          locationUrl: url || undefined,
           notes: notes.trim() || undefined,
         },
       });
@@ -477,11 +485,23 @@ function EditDialog({
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Location</label>
+              <label className="text-xs font-medium text-muted-foreground">Location name</label>
               <Input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. GenZ HQ, Zamalek"
+                placeholder="e.g. GenZ HQ, Park Mall, New Cairo"
+                className="mt-1 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">
+                Google Maps URL (optional)
+              </label>
+              <Input
+                type="url"
+                value={locationUrl}
+                onChange={(e) => setLocationUrl(e.target.value)}
+                placeholder="https://maps.google.com/…"
                 className="mt-1 rounded-xl"
               />
             </div>

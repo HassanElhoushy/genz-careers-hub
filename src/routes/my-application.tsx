@@ -139,11 +139,23 @@ function MyApplicationPage() {
                       label="Date & Time"
                       value={`${format(new Date(app.interview.date), "PPP")} · ${app.interview.time}`}
                     />
-                    <InterviewRow
-                      icon={<MapPin className="h-4 w-4" />}
-                      label="Location"
-                      value={app.interview.location}
-                    />
+                    <div className="rounded-2xl border border-border bg-background p-4">
+                      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </div>
+                      <p className="mt-1.5 text-sm font-medium">{app.interview.location}</p>
+                      {app.interview.locationUrl && (
+                        <a
+                          href={app.interview.locationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                        >
+                          📍 Open in Google Maps
+                        </a>
+                      )}
+                    </div>
                     {app.interview.notes && (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
                         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">

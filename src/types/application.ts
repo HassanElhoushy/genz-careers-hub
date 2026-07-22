@@ -4,6 +4,7 @@ export type Interview = {
   date: string; // ISO date
   time: string; // HH:mm
   location: string;
+  locationUrl?: string;
   notes?: string;
 };
 
