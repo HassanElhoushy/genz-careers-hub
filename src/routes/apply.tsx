@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import { CalendarIcon, Check, Loader2 } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteLayout } from "@/layouts/SiteLayout";
@@ -13,8 +13,17 @@ import { BackgroundShapes } from "@/components/BackgroundShapes";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useApplications } from "@/hooks/use-applications";
+import { POSITIONS } from "@/lib/positions";
 
 export const Route = createFileRoute("/apply")({
   head: () => ({
@@ -22,7 +31,7 @@ export const Route = createFileRoute("/apply")({
       { title: "Apply — GenZ Careers" },
       {
         name: "description",
-        content: "Apply to join the GenZ team. Fill out a two-minute application and we'll be in touch.",
+        content: "Apply to join the GenZ team. Two minutes and you're in the loop.",
       },
       { property: "og:title", content: "Apply — GenZ Careers" },
       { property: "og:description", content: "Apply to join Egypt's leading local streetwear brand." },
@@ -49,6 +58,7 @@ const schema = z.object({
     .regex(/[A-Z]/, "Include an uppercase letter")
     .regex(/[a-z]/, "Include a lowercase letter")
     .regex(/[0-9]/, "Include a number"),
+  position: z.string().min(1, "Pick a position"),
   birthday: z
     .date({ required_error: "Pick your birthday" })
     .max(minAgeDate, "You must be at least 16"),
@@ -92,6 +102,7 @@ function ApplyPage() {
   const navigate = useNavigate();
   const add = useApplications((s) => s.add);
   const [success, setSuccess] = useState(false);
+  const [positionOpen, setPositionOpen] = useState(false);
 
   const {
     register,
@@ -102,29 +113,37 @@ function ApplyPage() {
     reset,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", password: "" },
+    defaultValues: { name: "", email: "", phone: "", password: "", position: "" },
   });
 
   const birthday = watch("birthday");
+  const position = watch("position");
 
   const onSubmit = async (data: FormValues) => {
-    // Simulate submission latency for polish
-    await new Promise((r) => setTimeout(r, 700));
-    add({
+    await new Promise((r) => setTimeout(r, 500));
+    const result = add({
       name: data.name,
       email: data.email,
       phone: data.phone,
+      password: data.password,
+      position: data.position,
       birthday: data.birthday.toISOString(),
     });
+    if (!result.ok) {
+      toast.error("An account with this email already exists.", {
+        description: "Try signing in instead.",
+      });
+      return;
+    }
     setSuccess(true);
-    toast.success("Application submitted!", {
-      description: "We'll be in touch soon.",
+    toast.success("Account created!", {
+      description: "Sign in to track your application.",
     });
     reset();
     setTimeout(() => {
       setSuccess(false);
-      navigate({ to: "/dashboard" });
-    }, 1500);
+      navigate({ to: "/signin" });
+    }, 1400);
   };
 
   return (
@@ -170,7 +189,7 @@ function ApplyPage() {
                     <Check className="h-8 w-8" strokeWidth={3} />
                   </motion.div>
                   <p className="mt-4 text-lg font-semibold">Application received</p>
-                  <p className="text-sm text-muted-foreground">Redirecting…</p>
+                  <p className="text-sm text-muted-foreground">Redirecting to sign in…</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -203,6 +222,57 @@ function ApplyPage() {
                 error={errors.password?.message}
                 {...register("password")}
               />
+
+              {/* Position combobox */}
+              <div>
+                <Popover open={positionOpen} onOpenChange={setPositionOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-xl border bg-background px-4 py-4 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15",
+                        errors.position ? "border-destructive" : "border-input",
+                      )}
+                    >
+                      <span className={cn(position ? "text-foreground" : "text-muted-foreground")}>
+                        {position || "Select a position"}
+                      </span>
+                      <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search positions…" />
+                      <CommandList>
+                        <CommandEmpty>No matches.</CommandEmpty>
+                        <CommandGroup>
+                          {POSITIONS.map((p) => (
+                            <CommandItem
+                              key={p}
+                              value={p}
+                              onSelect={() => {
+                                setValue("position", p, { shouldValidate: true });
+                                setPositionOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  position === p ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {p}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {errors.position && (
+                  <p className="mt-1.5 text-xs text-destructive">{errors.position.message}</p>
+                )}
+              </div>
 
               {/* Birthday */}
               <div>

@@ -41,42 +41,61 @@ const getServerSnapshot = () => [] as Application[];
 
 export const applicationsStore = {
   get: () => state,
-  add: (data: Omit<Application, "id" | "submittedAt">): Application => {
+  add: (
+    data: Omit<Application, "id" | "submittedAt" | "status">,
+  ): { ok: true; app: Application } | { ok: false; reason: "duplicate" } => {
+    const email = data.email.trim().toLowerCase();
+    if (state.some((a) => a.email.toLowerCase() === email)) {
+      return { ok: false, reason: "duplicate" };
+    }
     const app: Application = {
       ...data,
+      email,
       id: crypto.randomUUID(),
+      status: "pending",
       submittedAt: new Date().toISOString(),
     };
     setState([app, ...state]);
-    return app;
+    return { ok: true, app };
+  },
+  update: (id: string, patch: Partial<Application>) => {
+    setState(state.map((a) => (a.id === id ? { ...a, ...patch } : a)));
   },
   remove: (id: string) => {
     setState(state.filter((a) => a.id !== id));
   },
+  findByCredentials: (email: string, password: string) => {
+    const e = email.trim().toLowerCase();
+    return state.find((a) => a.email.toLowerCase() === e && a.password === password);
+  },
+  findByEmail: (email: string) => {
+    const e = email.trim().toLowerCase();
+    return state.find((a) => a.email.toLowerCase() === e);
+  },
 };
 
-type Selected<T> = T;
+type Store = {
+  applications: Application[];
+  add: typeof applicationsStore.add;
+  update: typeof applicationsStore.update;
+  remove: typeof applicationsStore.remove;
+  findByCredentials: typeof applicationsStore.findByCredentials;
+  findByEmail: typeof applicationsStore.findByEmail;
+  hydrated: boolean;
+  hydrate: () => void;
+};
 
-export function useApplications<T = {
-  applications: Application[];
-  add: typeof applicationsStore.add;
-  remove: typeof applicationsStore.remove;
-  hydrated: boolean;
-  hydrate: () => void;
-}>(selector?: (s: {
-  applications: Application[];
-  add: typeof applicationsStore.add;
-  remove: typeof applicationsStore.remove;
-  hydrated: boolean;
-  hydrate: () => void;
-}) => T): Selected<T> {
+export function useApplications<T = Store>(selector?: (s: Store) => T): T {
   const applications = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const value = {
+  const value: Store = {
     applications,
     add: applicationsStore.add,
+    update: applicationsStore.update,
     remove: applicationsStore.remove,
+    findByCredentials: applicationsStore.findByCredentials,
+    findByEmail: applicationsStore.findByEmail,
     hydrated: true,
     hydrate: () => {},
   };
-  return (selector ? selector(value) : (value as unknown as T)) as Selected<T>;
+  return (selector ? selector(value) : (value as unknown as T)) as T;
 }
