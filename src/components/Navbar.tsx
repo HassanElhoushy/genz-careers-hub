@@ -59,9 +59,9 @@ export function Navbar() {
             <Link
               to={authedHome}
               activeOptions={{ exact: true }}
-              activeProps={{ className: "bg-primary text-primary-foreground" }}
-              inactiveProps={{ className: "bg-accent text-foreground hover:bg-primary/10" }}
-              className="rounded-full px-10 py-2.5 text-sm font-semibold tracking-wide transition-colors min-w-[220px] text-center"
+              activeProps={{ className: "text-foreground bg-accent" }}
+              inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
+              className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
             >
               {authedLabel}
             </Link>
