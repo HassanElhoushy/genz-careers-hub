@@ -54,19 +54,7 @@ export function Navbar() {
           <span className="font-display text-lg font-bold tracking-tight">GenZ</span>
         </Link>
 
-        {authed ? (
-          <nav className="hidden md:flex flex-1 items-center justify-center">
-            <Link
-              to={authedHome}
-              activeOptions={{ exact: true }}
-              activeProps={{ className: "text-foreground bg-accent" }}
-              inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
-              className="min-w-[12rem] rounded-full px-10 py-2.5 text-center text-sm font-medium transition-colors hover:bg-accent"
-            >
-              {authedLabel}
-            </Link>
-          </nav>
-        ) : (
+        {!authed && (
           <nav className="hidden md:flex items-center gap-1">
             {publicLinks.map((l) => (
               <Link
