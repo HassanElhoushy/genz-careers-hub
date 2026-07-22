@@ -180,19 +180,24 @@ export function Navbar() {
                 <Link
                   to="/"
                   onClick={handleHomeClick}
-                  activeOptions={{ exact: true }}
-                  activeProps={{ className: "bg-accent text-foreground" }}
-                  className="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent"
+                  className={cn(
+                    "rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent",
+                    homeActive && "bg-accent text-foreground",
+                  )}
                 >
                   Home
                 </Link>
                 <a
                   href="/#about"
                   onClick={handleAboutClick}
-                  className="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent"
+                  className={cn(
+                    "rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent",
+                    aboutActive && "bg-accent text-foreground",
+                  )}
                 >
                   About Us
                 </a>
+
                 <Link
                   to="/signin"
                   onClick={() => setOpen(false)}
