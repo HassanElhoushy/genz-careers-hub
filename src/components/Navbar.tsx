@@ -10,6 +10,7 @@ import { sessionStore, useSession } from "@/hooks/use-session";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<"home" | "about">("home");
   const session = useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -20,6 +21,25 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setActiveSection("home");
+      return;
+    }
+    const onScroll = () => {
+      const el = document.getElementById("about");
+      if (!el) {
+        setActiveSection("home");
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      setActiveSection(rect.top < 120 && rect.bottom > 120 ? "about" : "home");
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
 
   const isAdmin = session?.role === "admin";
   const isApplicant = session?.role === "applicant";
@@ -53,6 +73,10 @@ export function Navbar() {
     }
     setOpen(false);
   };
+
+  const homeActive = !authed && pathname === "/" && activeSection === "home";
+  const aboutActive = !authed && pathname === "/" && activeSection === "about";
+
 
   return (
     <header
