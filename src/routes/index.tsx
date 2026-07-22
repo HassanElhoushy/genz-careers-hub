@@ -139,26 +139,20 @@ function Index() {
               </h2>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
                 <p>
-                  GenZ's was created with one mission: to redefine fashion for the next
-                  generation.
+                  GenZ's was created to redefine fashion for the next generation.
                 </p>
                 <p>
-                  What began as a simple question about why people choose the clothes they
-                  wear has grown into one of Egypt's destinations for local fashion. We
-                  believe style is more than clothing — it is a way to express identity,
-                  creativity, and confidence.
+                  What started as a simple question about why we wear what we wear has
+                  grown into one of Egypt's destinations for local fashion. We see style
+                  as a way to express identity, creativity, and confidence.
                 </p>
                 <p>
-                  By bringing Egyptian local brands together in one place, GenZ's makes it
-                  easier for customers to discover distinctive, high-quality products
-                  while supporting local designers, creators, and manufacturers.
-                </p>
-                <p>
-                  Today, we continue to grow while staying connected to our roots through
-                  local manufacturing, meaningful partnerships, and a commitment to
-                  empowering young creators.
+                  By bringing Egyptian brands together in one place, we make it easier
+                  to discover distinctive, high-quality pieces while supporting local
+                  designers, creators, and manufacturers.
                 </p>
               </div>
+
             </motion.div>
 
             <div className="flex flex-col gap-5 lg:pt-16">
