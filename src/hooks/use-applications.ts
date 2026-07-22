@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { useSyncExternalStore } from "react";
 import type { Application } from "@/types/application";
 
 const STORAGE_KEY = "genz_applications";
@@ -20,35 +20,63 @@ function save(items: Application[]) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
 
-type State = {
-  applications: Application[];
-  hydrated: boolean;
-  hydrate: () => void;
-  add: (app: Omit<Application, "id" | "submittedAt">) => Application;
-  remove: (id: string) => void;
+let state: Application[] = typeof window !== "undefined" ? load() : [];
+const listeners = new Set<() => void>();
+
+function setState(next: Application[]) {
+  state = next;
+  save(next);
+  listeners.forEach((l) => l());
+}
+
+const subscribe = (cb: () => void) => {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
 };
 
-export const useApplications = create<State>((set, get) => ({
-  applications: [],
-  hydrated: false,
-  hydrate: () => {
-    if (get().hydrated) return;
-    set({ applications: load(), hydrated: true });
-  },
-  add: (data) => {
+const getSnapshot = () => state;
+const getServerSnapshot = () => [] as Application[];
+
+export const applicationsStore = {
+  get: () => state,
+  add: (data: Omit<Application, "id" | "submittedAt">): Application => {
     const app: Application = {
       ...data,
       id: crypto.randomUUID(),
       submittedAt: new Date().toISOString(),
     };
-    const next = [app, ...get().applications];
-    save(next);
-    set({ applications: next });
+    setState([app, ...state]);
     return app;
   },
-  remove: (id) => {
-    const next = get().applications.filter((a) => a.id !== id);
-    save(next);
-    set({ applications: next });
+  remove: (id: string) => {
+    setState(state.filter((a) => a.id !== id));
   },
-}));
+};
+
+type Selected<T> = T;
+
+export function useApplications<T = {
+  applications: Application[];
+  add: typeof applicationsStore.add;
+  remove: typeof applicationsStore.remove;
+  hydrated: boolean;
+  hydrate: () => void;
+}>(selector?: (s: {
+  applications: Application[];
+  add: typeof applicationsStore.add;
+  remove: typeof applicationsStore.remove;
+  hydrated: boolean;
+  hydrate: () => void;
+}) => T): Selected<T> {
+  const applications = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const value = {
+    applications,
+    add: applicationsStore.add,
+    remove: applicationsStore.remove,
+    hydrated: true,
+    hydrate: () => {},
+  };
+  return (selector ? selector(value) : (value as unknown as T)) as Selected<T>;
+}
