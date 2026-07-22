@@ -105,7 +105,7 @@ function Index() {
                 variant="outline"
                 className="rounded-full px-7 border-foreground/15"
               >
-                <Link to="/dashboard">View Dashboard</Link>
+                <Link to="/signin">Sign In</Link>
               </Button>
             </motion.div>
           </motion.div>

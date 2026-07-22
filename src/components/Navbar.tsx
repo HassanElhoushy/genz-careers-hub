@@ -1,20 +1,17 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/apply", label: "Apply" },
-  { to: "/dashboard", label: "Dashboard" },
-] as const;
+import { sessionStore, useSession } from "@/hooks/use-session";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const session = useSession();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -22,6 +19,26 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const baseLinks: { to: string; label: string }[] = [
+    { to: "/", label: "Home" },
+    { to: "/apply", label: "Apply Now" },
+  ];
+
+  const authedLink =
+    session?.role === "admin"
+      ? { to: "/admin", label: "Admin" }
+      : session?.role === "applicant"
+        ? { to: "/my-application", label: "My Application" }
+        : null;
+
+  const links = authedLink ? [...baseLinks, authedLink] : [...baseLinks, { to: "/signin", label: "Sign In" }];
+
+  const handleSignOut = () => {
+    sessionStore.signOut();
+    setOpen(false);
+    navigate({ to: "/" });
+  };
 
   return (
     <header
@@ -55,9 +72,21 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
-            <Link to="/apply">Apply Now</Link>
-          </Button>
+          {session ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSignOut}
+              className="hidden sm:inline-flex rounded-full"
+            >
+              <LogOut className="mr-1 h-4 w-4" />
+              Sign Out
+            </Button>
+          ) : (
+            <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
+              <Link to="/apply">Apply Now</Link>
+            </Button>
+          )}
           <button
             className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent"
             onClick={() => setOpen((v) => !v)}
@@ -83,6 +112,14 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
+            {session && (
+              <button
+                onClick={handleSignOut}
+                className="mt-2 flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" /> Sign Out
+              </button>
+            )}
           </nav>
         </div>
       )}
