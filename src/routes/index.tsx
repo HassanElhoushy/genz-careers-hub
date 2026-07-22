@@ -16,22 +16,23 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Careers at GenZ's — Shape the Future of Local Fashion" },
+      { title: "Join the GenZ's Team — Careers at GenZ's" },
       {
         name: "description",
         content:
           "Join GenZ's, a destination for Egyptian local fashion. Explore roles bringing together fashion, creativity, community, and technology.",
       },
-      { property: "og:title", content: "Careers at GenZ's — Shape the Future of Local Fashion" },
+      { property: "og:title", content: "Join the GenZ's Team — Careers at GenZ's" },
       {
         property: "og:description",
         content:
-          "Build your career with GenZ's — a home for Egyptian local fashion, creators, and community.",
+          "Build your career with GenZ's, a home for Egyptian local fashion, creators, and community.",
       },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
+
   component: Index,
 });
 
