@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
@@ -12,6 +12,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const session = useSession();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -25,18 +26,32 @@ export function Navbar() {
   const authed = isAdmin || isApplicant;
 
   const authedHome: "/admin" | "/my-application" = isAdmin ? "/admin" : "/my-application";
-  const authedLabel = isAdmin ? "Admin Panel" : "My Application";
-
-  const publicLinks: { to: "/" | "/apply" | "/signin"; label: string }[] = [
-    { to: "/", label: "Home" },
-    { to: "/apply", label: "Apply Now" },
-    { to: "/signin", label: "Sign In" },
-  ];
 
   const handleSignOut = () => {
     sessionStore.signOut();
     setOpen(false);
     navigate({ to: "/" });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      scrollToTop();
+    }
+    setOpen(false);
+  };
+
+  const handleAboutClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      const el = document.getElementById("about");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    setOpen(false);
   };
 
   return (
@@ -48,30 +63,46 @@ export function Navbar() {
           : "bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link to={authed ? authedHome : "/"} className="flex items-center gap-2.5 shrink-0">
-          <Logo className="h-9 w-9" />
-          <span className="font-display text-lg font-bold tracking-tight">GenZ</span>
-        </Link>
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 lg:px-8">
+        {/* Left: logo */}
+        <div className="flex items-center">
+          <Link
+            to={authed ? authedHome : "/"}
+            onClick={authed ? undefined : handleHomeClick}
+            className="flex items-center gap-2.5 shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Logo className="h-9 w-9" />
+            <span className="font-display text-lg font-bold tracking-tight">GenZ's</span>
+          </Link>
+        </div>
 
-        {!authed && (
-          <nav className="hidden md:flex items-center gap-1">
-            {publicLinks.map((l) => (
+        {/* Center: public nav */}
+        <nav className="hidden md:flex items-center gap-1 justify-self-center">
+          {!authed && (
+            <>
               <Link
-                key={l.to}
-                to={l.to}
+                to="/"
+                onClick={handleHomeClick}
                 activeOptions={{ exact: true }}
                 activeProps={{ className: "text-foreground bg-accent" }}
                 inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
-                className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                className="rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {l.label}
+                Home
               </Link>
-            ))}
-          </nav>
-        )}
+              <a
+                href="/#about"
+                onClick={handleAboutClick}
+                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                About Us
+              </a>
+            </>
+          )}
+        </nav>
 
-        <div className="flex items-center gap-2">
+        {/* Right */}
+        <div className="flex items-center gap-2 justify-self-end">
           <ThemeToggle />
           {authed ? (
             <Button
@@ -84,14 +115,25 @@ export function Navbar() {
               Sign Out
             </Button>
           ) : (
-            <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
-              <Link to="/apply">Apply Now</Link>
-            </Button>
+            <>
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="hidden sm:inline-flex rounded-full border-foreground/15"
+              >
+                <Link to="/signin">Sign In</Link>
+              </Button>
+              <Button asChild size="sm" className="hidden sm:inline-flex rounded-full">
+                <Link to="/apply">Apply Now</Link>
+              </Button>
+            </>
           )}
           <button
-            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent"
+            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
+            aria-expanded={open}
           >
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -101,19 +143,40 @@ export function Navbar() {
       {open && (
         <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4">
-            {!authed &&
-              publicLinks.map((l) => (
+            {!authed && (
+              <>
                 <Link
-                  key={l.to}
-                  to={l.to}
-                  onClick={() => setOpen(false)}
+                  to="/"
+                  onClick={handleHomeClick}
                   activeOptions={{ exact: true }}
                   activeProps={{ className: "bg-accent text-foreground" }}
                   className="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent"
                 >
-                  {l.label}
+                  Home
                 </Link>
-              ))}
+                <a
+                  href="/#about"
+                  onClick={handleAboutClick}
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent"
+                >
+                  About Us
+                </a>
+                <Link
+                  to="/signin"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-accent"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/apply"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  Apply Now
+                </Link>
+              </>
+            )}
             {authed && (
               <button
                 onClick={handleSignOut}

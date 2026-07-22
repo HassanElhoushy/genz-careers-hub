@@ -28,13 +28,13 @@ import { POSITIONS } from "@/lib/positions";
 export const Route = createFileRoute("/apply")({
   head: () => ({
     meta: [
-      { title: "Apply — GenZ Careers" },
+      { title: "Apply — GenZ's Careers" },
       {
         name: "description",
-        content: "Apply to join the GenZ team. Two minutes and you're in the loop.",
+        content: "Apply to join the GenZ's team. Two minutes and you're in the loop.",
       },
-      { property: "og:title", content: "Apply — GenZ Careers" },
-      { property: "og:description", content: "Apply to join Egypt's leading local streetwear brand." },
+      { property: "og:title", content: "Apply — GenZ's Careers" },
+      { property: "og:description", content: "Apply to join a destination for Egyptian local fashion." },
       { property: "og:url", content: "/apply" },
     ],
     links: [{ rel: "canonical", href: "/apply" }],
@@ -158,7 +158,7 @@ function ApplyPage() {
             className="text-center"
           >
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Careers · GenZ
+              Careers · GenZ's
             </p>
             <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">Apply Now</h1>
             <p className="mt-3 text-sm text-muted-foreground sm:text-base">

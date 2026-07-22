@@ -13,10 +13,10 @@ export function Footer() {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5">
             <Logo className="h-10 w-10" />
-            <span className="font-display text-xl font-bold tracking-tight text-white">GenZ</span>
+            <span className="font-display text-xl font-bold tracking-tight text-white">GenZ's</span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
-            Egyptian streetwear rooted in culture. Designed in Cairo, worn everywhere.
+            Egyptian local fashion, brought together in one destination. Designed in Cairo, worn everywhere.
           </p>
         </div>
 
@@ -24,7 +24,8 @@ export function Footer() {
           <h4 className="text-sm font-semibold text-white">Quick Links</h4>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
-            <li><Link to="/apply" className="hover:text-white transition-colors">Apply</Link></li>
+            <li><a href="/#about" className="hover:text-white transition-colors">About Us</a></li>
+            <li><Link to="/apply" className="hover:text-white transition-colors">Apply Now</Link></li>
             <li><Link to="/signin" className="hover:text-white transition-colors">Sign In</Link></li>
           </ul>
         </div>
@@ -59,7 +60,7 @@ export function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-white/50 sm:flex-row sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} GenZ. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GenZ's. All rights reserved.</p>
           <p>Made in Cairo.</p>
         </div>
       </div>
