@@ -29,8 +29,8 @@ export const Route = createFileRoute("/signin")({
 });
 
 const schema = z.object({
-  email: z.string().trim().min(1, "Enter your email"),
-  password: z.string().min(1, "Enter your password"),
+  email: z.string().trim().email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -94,7 +94,14 @@ function SignInPage() {
       password: data.password,
     });
     if (signInErr) {
-      setError("Invalid email or password.");
+      const code = (signInErr as { code?: string }).code;
+      if (code === "invalid_credentials" || /invalid/i.test(signInErr.message)) {
+        setError("Wrong email or password.");
+      } else if (code === "email_not_confirmed") {
+        setError("Please confirm your email first, then try again.");
+      } else {
+        setError(signInErr.message);
+      }
       return;
     }
     toast.success("Signed in.");
@@ -139,6 +146,15 @@ function SignInPage() {
                 error={errors.password?.message}
                 {...register("password")}
               />
+
+              <div className="flex justify-end -mt-2">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               {error && (
                 <p className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
