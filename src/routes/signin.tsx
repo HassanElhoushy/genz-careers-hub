@@ -11,8 +11,8 @@ import { SiteLayout } from "@/layouts/SiteLayout";
 import { BackgroundShapes } from "@/components/BackgroundShapes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { applicationsStore } from "@/hooks/use-applications";
-import { sessionStore, useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/signin")({
   head: () => ({
