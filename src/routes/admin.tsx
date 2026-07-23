@@ -388,9 +388,9 @@ function DeleteButton({ onConfirm }: { onConfirm: () => void }) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this application?</AlertDialogTitle>
+          <AlertDialogTitle>Delete this applicant?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently remove the submission from your local device.
+            This permanently removes the applicant's account, profile, and application. Their email will be free to apply again.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
