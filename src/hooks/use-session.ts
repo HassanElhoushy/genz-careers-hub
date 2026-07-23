@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 export type Session =
-  | { role: "admin"; email: "admin" }
+  | { role: "admin"; email: string }
   | { role: "applicant"; email: string }
   | null;
 
@@ -43,7 +43,7 @@ const subscribe = (cb: () => void) => {
 
 export const sessionStore = {
   get: () => state,
-  signInAdmin: () => setState({ role: "admin", email: "admin" }),
+  signInAdmin: () => setState({ role: "admin", email: "admin@genz-s.com" }),
   signInApplicant: (email: string) =>
     setState({ role: "applicant", email: email.trim().toLowerCase() }),
   signOut: () => setState(null),

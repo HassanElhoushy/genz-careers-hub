@@ -91,7 +91,7 @@ function SignInPage() {
     setError(null);
     await new Promise((r) => setTimeout(r, 400));
 
-    if (data.email.trim().toLowerCase() === "admin" && data.password === "admin") {
+    if (data.email.trim().toLowerCase() === "admin@genz-s.com" && data.password === "admin") {
       sessionStore.signInAdmin();
       toast.success("Welcome back, admin.");
       navigate({ to: "/admin" });

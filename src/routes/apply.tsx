@@ -58,6 +58,13 @@ const schema = z.object({
     .regex(/[A-Z]/, "Include an uppercase letter")
     .regex(/[a-z]/, "Include a lowercase letter")
     .regex(/[0-9]/, "Include a number"),
+  linkedinUrl: z
+    .string()
+    .trim()
+    .max(200, "URL too long")
+    .url("Enter a valid URL (include https://)")
+    .optional()
+    .or(z.literal("")),
   position: z.string().min(1, "Pick a position"),
   birthday: z
     .date({ required_error: "Pick your birthday" })
@@ -113,7 +120,7 @@ function ApplyPage() {
     reset,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", password: "", position: "" },
+    defaultValues: { name: "", email: "", phone: "", password: "", linkedinUrl: "", position: "" },
   });
 
   const birthday = watch("birthday");
@@ -126,6 +133,7 @@ function ApplyPage() {
       email: data.email,
       phone: data.phone,
       password: data.password,
+      linkedinUrl: data.linkedinUrl?.trim() || undefined,
       position: data.position,
       birthday: data.birthday.toISOString(),
     });
@@ -221,6 +229,13 @@ function ApplyPage() {
                 autoComplete="new-password"
                 error={errors.password?.message}
                 {...register("password")}
+              />
+              <FloatingField
+                label="LinkedIn or portfolio URL (optional)"
+                type="url"
+                autoComplete="url"
+                error={errors.linkedinUrl?.message}
+                {...register("linkedinUrl")}
               />
 
               {/* Position combobox */}

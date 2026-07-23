@@ -16,6 +16,7 @@ export type Application = {
   birthday: string; // ISO date
   position: string;
   password: string; // demo-only, plain-text (localStorage)
+  linkedinUrl?: string;
   status: ApplicationStatus;
   interview?: Interview;
   rejectionReason?: string;
