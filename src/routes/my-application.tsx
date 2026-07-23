@@ -99,9 +99,9 @@ function MyApplicationPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     Submitted {format(new Date(app.submittedAt), "PPP")}
                   </p>
-                  {app.linkedinUrl && (
+                  {app.portfolioUrl && (
                     <a
-                      href={app.linkedinUrl}
+                      href={app.portfolioUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
