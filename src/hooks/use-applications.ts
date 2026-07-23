@@ -10,10 +10,12 @@ type ApplicationRow = {
   position: string;
   status: string;
   portfolio_url: string | null;
+  interview_type: string | null;
   interview_date: string | null;
   interview_time: string | null;
   interview_location: string | null;
   interview_location_url: string | null;
+  interview_meeting_url: string | null;
   interview_notes: string | null;
   rejection_reason: string | null;
   submitted_at: string;
