@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { CalendarIcon, Inbox, Pencil, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, ExternalLink, Inbox, Pencil, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteLayout } from "@/layouts/SiteLayout";
@@ -220,9 +220,11 @@ function AdminPage() {
                       <TableHead>Position</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
+                      <TableHead>Portfolio</TableHead>
                       <TableHead>Submitted</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-24 text-right">Actions</TableHead>
+
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -230,11 +232,26 @@ function AdminPage() {
                       <TableRow key={a.id}>
                         <TableCell className="font-medium">{a.name}</TableCell>
                         <TableCell className="text-muted-foreground">{a.position}</TableCell>
-                        <TableCell className="text-muted-foreground">{a.email}</TableCell>
+                        <TableCell className="text-muted-foreground">{a.email || "—"}</TableCell>
                         <TableCell className="text-muted-foreground">{a.phone}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {a.portfolioUrl ? (
+                            <a
+                              href={a.portfolioUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-primary hover:underline"
+                            >
+                              View <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            "—"
+                          )}
+                        </TableCell>
                         <TableCell className="text-muted-foreground">
                           {format(new Date(a.submittedAt), "PP")}
                         </TableCell>
+
                         <TableCell>
                           <Select
                             value={a.status}
@@ -275,9 +292,20 @@ function AdminPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="truncate text-base font-semibold">{a.name}</p>
-                        <p className="truncate text-sm text-muted-foreground">{a.email}</p>
+                        <p className="truncate text-sm text-muted-foreground">{a.email || "—"}</p>
                         <p className="mt-1 text-xs text-primary">{a.position}</p>
+                        {a.portfolioUrl && (
+                          <a
+                            href={a.portfolioUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                          >
+                            Portfolio <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
+
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => setEditing(a)}

@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getApplicantEmails } from "@/lib/admin-applications.functions";
 import type { Application, ApplicationStatus, Interview } from "@/types/application";
+
 
 type ApplicationRow = {
   id: string;
@@ -101,24 +103,28 @@ export function useAllApplications(enabled: boolean) {
       const ids = (apps ?? []).map((a) => a.user_id);
       if (ids.length === 0) return [];
 
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, phone, birthday")
-        .in("id", ids);
+      const [{ data: profiles }, emailMap] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, name, phone, birthday")
+          .in("id", ids),
+        getApplicantEmails().catch(() => ({}) as Record<string, string>),
+      ]);
 
-      // Emails come from auth.users which is not directly queryable client-side;
-      // fall back to blank + rely on name/phone. For a fuller admin view a
-      // server function could join auth.users, but the current UI shows email
-      // only in the desktop table — we keep it best-effort here.
       const profileById = new Map<string, ProfileRow>();
       (profiles ?? []).forEach((p) => profileById.set(p.id, p as ProfileRow));
 
       return (apps ?? []).map((a) =>
-        toApplication(a as ApplicationRow, profileById.get(a.user_id) ?? null, ""),
+        toApplication(
+          a as ApplicationRow,
+          profileById.get(a.user_id) ?? null,
+          emailMap[a.user_id] ?? "",
+        ),
       );
     },
   });
 }
+
 
 // ---------------------------------------------------------------------------
 // Mutations
