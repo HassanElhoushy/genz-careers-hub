@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import type { Session as SupabaseSession, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,14 +11,13 @@ export type SessionState = {
   loading: boolean;
 };
 
-const initialState: SessionState = {
+let state: SessionState = {
   session: null,
   user: null,
   role: null,
   loading: true,
 };
 
-let state: SessionState = initialState;
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<SessionState>) {
@@ -45,16 +44,26 @@ async function hydrate(session: SupabaseSession | null) {
   setState({ session, user: session.user, role, loading: false });
 }
 
-let bootstrapped = false;
-function bootstrap() {
-  if (bootstrapped || typeof window === "undefined") return;
-  bootstrapped = true;
-
+if (typeof window !== "undefined") {
   supabase.auth.getSession().then(({ data }) => hydrate(data.session));
-
   supabase.auth.onAuthStateChange((_event, session) => {
     hydrate(session);
   });
+}
+
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+function getSnapshot() {
+  return state;
+}
+
+function getServerSnapshot() {
+  return state;
 }
 
 export const sessionStore = {
@@ -66,16 +75,6 @@ export const sessionStore = {
 };
 
 export function useSession(): SessionState {
-  bootstrap();
-  const [snapshot, setSnapshot] = useState(state);
-  useEffect(() => {
-    const cb = () => setSnapshot(state);
-    listeners.add(cb);
-    // resync in case state changed between render and effect
-    cb();
-    return () => {
-      listeners.delete(cb);
-    };
-  }, []);
-  return snapshot;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
+
