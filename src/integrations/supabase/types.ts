@@ -20,8 +20,10 @@ export type Database = {
           interview_date: string | null
           interview_location: string | null
           interview_location_url: string | null
+          interview_meeting_url: string | null
           interview_notes: string | null
           interview_time: string | null
+          interview_type: string | null
           portfolio_url: string | null
           position: string
           rejection_reason: string | null
@@ -35,8 +37,10 @@ export type Database = {
           interview_date?: string | null
           interview_location?: string | null
           interview_location_url?: string | null
+          interview_meeting_url?: string | null
           interview_notes?: string | null
           interview_time?: string | null
+          interview_type?: string | null
           portfolio_url?: string | null
           position: string
           rejection_reason?: string | null
@@ -50,8 +54,10 @@ export type Database = {
           interview_date?: string | null
           interview_location?: string | null
           interview_location_url?: string | null
+          interview_meeting_url?: string | null
           interview_notes?: string | null
           interview_time?: string | null
+          interview_type?: string | null
           portfolio_url?: string | null
           position?: string
           rejection_reason?: string | null
