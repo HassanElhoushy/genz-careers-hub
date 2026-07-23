@@ -76,7 +76,7 @@ function Index() {
               className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              Careers at GenZ's
+              We are hiring now!
             </motion.span>
 
             <motion.h1
@@ -97,9 +97,8 @@ function Index() {
               custom={2}
               className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg"
             >
-              Join a team bringing together fashion, creativity, community, and technology
-              to help Egyptian brands grow and give the next generation new ways to
-              express themselves.
+              Build your future with one of Egypt's fastest-growing fashion brands and
+              collaborate with creative minds to build the future of fashion.
             </motion.p>
 
             <motion.div
@@ -124,68 +123,56 @@ function Index() {
         className="scroll-mt-24 border-t border-border bg-muted/30"
       >
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6 }}
-            >
-              <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-                About GenZ's
-              </p>
-              <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-                Built for the Next Generation of Fashion
-              </h2>
-              <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
-                <p>
-                  GenZ's was created to redefine fashion for the next generation.
-                </p>
-                <p>
-                  What started as a simple question about why we wear what we wear has
-                  grown into one of Egypt's destinations for local fashion. We see style
-                  as a way to express identity, creativity, and confidence.
-                </p>
-                <p>
-                  By bringing Egyptian brands together in one place, we make it easier
-                  to discover distinctive, high-quality pieces while supporting local
-                  designers, creators, and manufacturers.
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="mx-auto max-w-2xl text-center"
+          >
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
+              About GenZ's
+            </p>
+            <h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+              Built for the Next Generation of Fashion
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              GenZ's is one of Egypt's destinations for local fashion, bringing Egyptian
+              brands together in one place and giving the next generation new ways to
+              express identity, creativity, and confidence.
+            </p>
+          </motion.div>
 
-            </motion.div>
-
-            <div className="flex flex-col gap-5 lg:pt-16">
-              {[
-                {
-                  Icon: Target,
-                  title: "Our Mission",
-                  body: "To make high-quality local fashion more accessible, inspire self-expression, and support the growth of Egyptian brands.",
-                },
-                {
-                  Icon: Compass,
-                  title: "Our Vision",
-                  body: "To become a leading fashion destination for Gen Z across the Middle East, connecting people with brands that reflect their identity, creativity, and culture.",
-                },
-              ].map((c, i) => (
-                <motion.div
-                  key={c.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="rounded-2xl border border-border bg-card p-7 transition-all hover:border-primary/30 hover:shadow-[var(--shadow-soft)]"
-                >
-                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <c.Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-4 text-xl font-bold">{c.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {c.body}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+          <div className="mt-14 grid gap-6 md:grid-cols-2">
+            {[
+              {
+                Icon: Target,
+                title: "Our Mission",
+                body: "To make high-quality local fashion more accessible, inspire self-expression, and support the growth of Egyptian brands.",
+              },
+              {
+                Icon: Compass,
+                title: "Our Vision",
+                body: "To become a leading fashion destination for Gen Z across the Middle East, connecting people with brands that reflect their identity, creativity, and culture.",
+              },
+            ].map((c, i) => (
+              <motion.div
+                key={c.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative rounded-2xl border border-border bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[var(--shadow-elevated)]"
+              >
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                  <c.Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-xl font-bold">{c.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {c.body}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
