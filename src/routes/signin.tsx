@@ -94,7 +94,14 @@ function SignInPage() {
       password: data.password,
     });
     if (signInErr) {
-      setError("Invalid email or password.");
+      const code = (signInErr as { code?: string }).code;
+      if (code === "invalid_credentials" || /invalid/i.test(signInErr.message)) {
+        setError("Wrong email or password.");
+      } else if (code === "email_not_confirmed") {
+        setError("Please confirm your email first, then try again.");
+      } else {
+        setError(signInErr.message);
+      }
       return;
     }
     toast.success("Signed in.");
