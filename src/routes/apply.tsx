@@ -139,6 +139,7 @@ function ApplyPage() {
           name: data.name,
           phone: data.phone,
           birthday: birthdayIso,
+          position: data.position,
           portfolio_url: portfolio ?? "",
         },
       },
@@ -159,19 +160,6 @@ function ApplyPage() {
     const userId = signUp.user?.id;
     if (!userId) {
       toast.error("Signup succeeded but no user was returned. Please try signing in.");
-      return;
-    }
-
-    // 2) Insert the application row (RLS: auth.uid() = user_id, which is now set by signIn below)
-    // With auto-confirm on, signUp already returns a session, so auth.uid() matches user_id.
-    const { error: insertErr } = await supabase.from("applications").insert({
-      user_id: userId,
-      position: data.position,
-      portfolio_url: portfolio ?? null,
-    });
-
-    if (insertErr) {
-      toast.error("Couldn't save your application.", { description: insertErr.message });
       return;
     }
 
