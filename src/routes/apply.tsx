@@ -253,7 +253,7 @@ function ApplyPage() {
                 {...register("password")}
               />
               <FloatingField
-                label="Portfolio, LinkedIn, or any professional link (optional)"
+                label="Portfolio or LinkedIn (Optional)"
                 type="url"
                 autoComplete="url"
                 error={errors.portfolioUrl?.message}
