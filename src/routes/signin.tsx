@@ -89,24 +89,16 @@ function SignInPage() {
 
   const onSubmit = async (data: FormValues) => {
     setError(null);
-    await new Promise((r) => setTimeout(r, 400));
-
-    if (data.email.trim().toLowerCase() === "admin@genz-s.com" && data.password === "admin") {
-      sessionStore.signInAdmin();
-      toast.success("Welcome back, admin.");
-      navigate({ to: "/admin" });
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: data.email.trim(),
+      password: data.password,
+    });
+    if (signInErr) {
+      setError("Invalid email or password.");
       return;
     }
-
-    const applicant = applicationsStore.findByCredentials(data.email, data.password);
-    if (applicant) {
-      sessionStore.signInApplicant(applicant.email);
-      toast.success(`Welcome back, ${applicant.name.split(" ")[0]}.`);
-      navigate({ to: "/my-application" });
-      return;
-    }
-
-    setError("Invalid email or password.");
+    toast.success("Signed in.");
+    // Redirect happens via the useEffect above once role loads.
   };
 
   return (
