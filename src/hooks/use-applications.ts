@@ -10,10 +10,12 @@ type ApplicationRow = {
   position: string;
   status: string;
   portfolio_url: string | null;
+  interview_type: string | null;
   interview_date: string | null;
   interview_time: string | null;
   interview_location: string | null;
   interview_location_url: string | null;
+  interview_meeting_url: string | null;
   interview_notes: string | null;
   rejection_reason: string | null;
   submitted_at: string;
@@ -33,10 +35,12 @@ function toApplication(
 ): Application {
   const interview: Interview | undefined = row.interview_date
     ? {
+        type: (row.interview_type as "onsite" | "online") ?? "onsite",
         date: row.interview_date,
         time: row.interview_time ?? "",
-        location: row.interview_location ?? "",
+        location: row.interview_location ?? undefined,
         locationUrl: row.interview_location_url ?? undefined,
+        meetingUrl: row.interview_meeting_url ?? undefined,
         notes: row.interview_notes ?? undefined,
       }
     : undefined;
@@ -145,26 +149,32 @@ export function useUpdateApplication() {
     }) => {
       const patch: {
         status?: ApplicationStatus;
+        interview_type?: string | null;
         interview_date?: string | null;
         interview_time?: string | null;
         interview_location?: string | null;
         interview_location_url?: string | null;
+        interview_meeting_url?: string | null;
         interview_notes?: string | null;
         rejection_reason?: string | null;
       } = {};
       if (status !== undefined) patch.status = status;
       if (interview !== undefined) {
         if (interview === null) {
+          patch.interview_type = null;
           patch.interview_date = null;
           patch.interview_time = null;
           patch.interview_location = null;
           patch.interview_location_url = null;
+          patch.interview_meeting_url = null;
           patch.interview_notes = null;
         } else {
+          patch.interview_type = interview.type;
           patch.interview_date = interview.date;
           patch.interview_time = interview.time;
-          patch.interview_location = interview.location;
+          patch.interview_location = interview.location ?? null;
           patch.interview_location_url = interview.locationUrl ?? null;
+          patch.interview_meeting_url = interview.meetingUrl ?? null;
           patch.interview_notes = interview.notes ?? null;
         }
       }

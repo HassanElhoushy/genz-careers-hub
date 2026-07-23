@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { CalendarIcon, ExternalLink, Inbox, Pencil, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, ExternalLink, Inbox, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteLayout } from "@/layouts/SiteLayout";
@@ -269,13 +269,6 @@ function AdminPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="inline-flex items-center gap-1">
-                            <button
-                              onClick={() => setEditing(a)}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                              aria-label="Edit details"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </button>
                             <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
                           </div>
                         </TableCell>
@@ -307,13 +300,6 @@ function AdminPage() {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => setEditing(a)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                          aria-label="Edit"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
                         <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
                       </div>
                     </div>
@@ -430,19 +416,23 @@ function EditDialog({
   onClose: () => void;
   onSave: (id: string, patch: Partial<Application>) => void;
 }) {
+  const [interviewType, setInterviewType] = useState<"onsite" | "online">("onsite");
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [locationUrl, setLocationUrl] = useState("");
+  const [meetingUrl, setMeetingUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [reason, setReason] = useState("");
 
   useEffect(() => {
     if (!application) return;
+    setInterviewType(application.interview?.type ?? "onsite");
     setDate(application.interview ? new Date(application.interview.date) : undefined);
     setTime(application.interview?.time ?? "");
     setLocation(application.interview?.location ?? "");
     setLocationUrl(application.interview?.locationUrl ?? "");
+    setMeetingUrl(application.interview?.meetingUrl ?? "");
     setNotes(application.interview?.notes ?? "");
     setReason(application.rejectionReason ?? "");
   }, [application]);
@@ -454,24 +444,48 @@ function EditDialog({
 
   const handleSave = () => {
     if (isAccepted) {
-      if (!date || !time.trim() || !location.trim()) {
-        toast.error("Fill in date, time, and location.");
+      if (!date || !time.trim()) {
+        toast.error("Fill in date and time.");
         return;
       }
-      const url = locationUrl.trim();
-      if (url && !/^https?:\/\//i.test(url)) {
-        toast.error("Location URL must start with http:// or https://");
-        return;
+      if (interviewType === "onsite") {
+        if (!location.trim() || !locationUrl.trim()) {
+          toast.error("Location name and Google Maps URL are required.");
+          return;
+        }
+        if (!/^https?:\/\//i.test(locationUrl.trim())) {
+          toast.error("Location URL must start with http:// or https://");
+          return;
+        }
+        onSave(application.id, {
+          interview: {
+            type: "onsite",
+            date: date.toISOString(),
+            time,
+            location: location.trim(),
+            locationUrl: locationUrl.trim(),
+            notes: notes.trim() || undefined,
+          },
+        });
+      } else {
+        if (!meetingUrl.trim()) {
+          toast.error("Meeting URL is required.");
+          return;
+        }
+        if (!/^https?:\/\//i.test(meetingUrl.trim())) {
+          toast.error("Meeting URL must start with http:// or https://");
+          return;
+        }
+        onSave(application.id, {
+          interview: {
+            type: "online",
+            date: date.toISOString(),
+            time,
+            meetingUrl: meetingUrl.trim(),
+            notes: notes.trim() || undefined,
+          },
+        });
       }
-      onSave(application.id, {
-        interview: {
-          date: date.toISOString(),
-          time,
-          location: location.trim(),
-          locationUrl: url || undefined,
-          notes: notes.trim() || undefined,
-        },
-      });
     } else if (isRejected) {
       onSave(application.id, { rejectionReason: reason.trim() || undefined });
     } else {
@@ -506,6 +520,18 @@ function EditDialog({
 
         {isAccepted && (
           <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Interview type</label>
+              <Select value={interviewType} onValueChange={(v) => setInterviewType(v as "onsite" | "online")}>
+                <SelectTrigger className="mt-1 h-11 rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="onsite">On-site</SelectItem>
+                  <SelectItem value="online">Online</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Date</label>
@@ -543,27 +569,44 @@ function EditDialog({
                 />
               </div>
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Location name</label>
-              <Input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. GenZ's HQ, Park Mall, New Cairo"
-                className="mt-1 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">
-                Google Maps URL (optional)
-              </label>
-              <Input
-                type="url"
-                value={locationUrl}
-                onChange={(e) => setLocationUrl(e.target.value)}
-                placeholder="https://maps.google.com/…"
-                className="mt-1 rounded-xl"
-              />
-            </div>
+
+            {interviewType === "onsite" ? (
+              <>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">Location name</label>
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. GenZ's HQ, New Cairo"
+                    className="mt-1 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Google Maps location URL
+                  </label>
+                  <Input
+                    type="url"
+                    value={locationUrl}
+                    onChange={(e) => setLocationUrl(e.target.value)}
+                    placeholder="https://maps.google.com/…"
+                    className="mt-1 rounded-xl"
+                  />
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Meeting URL</label>
+                <Input
+                  type="url"
+                  value={meetingUrl}
+                  onChange={(e) => setMeetingUrl(e.target.value)}
+                  placeholder="https://meet.google.com/… or Zoom / Teams link"
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+            )}
+
             <div>
               <label className="text-xs font-medium text-muted-foreground">
                 Additional notes (optional)
