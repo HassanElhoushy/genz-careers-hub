@@ -1,37 +1,19 @@
-## 1. Mobile navbar (`src/components/Navbar.tsx`)
+## 1. Add LinkedIn / Portfolio field to Apply form
 
-On phones the 3-column grid renders as `[logo] [empty center] [toggle + hamburger]`, which leaves an awkward gap and hides the Apply Now / Sign In CTAs entirely until the menu is opened. Fix:
+- `src/types/application.ts`: add optional `linkedinUrl?: string` to `Application`.
+- `src/routes/apply.tsx`:
+  - Extend Zod schema with `linkedinUrl: z.string().trim().url("Enter a valid URL").max(200).optional().or(z.literal(""))`.
+  - Add a `FloatingField` labeled "LinkedIn or portfolio URL (optional)" between password and position.
+  - Pass `linkedinUrl` into `add(...)` on submit (normalize empty string to undefined).
+- `src/routes/admin.tsx`: show the link on the applicant row/detail as a clickable "🔗 Portfolio" opening in a new tab when present.
+- `src/routes/my-application.tsx`: (optional) display the saved link so applicants can confirm what they submitted.
 
-- Use a plain flex row (`flex items-center justify-between`) on mobile, and promote to the 3-column grid at `md:` only.
-- Keep Apply Now / Sign In hidden on mobile (they live inside the hamburger menu, which is correct), so mobile shows: logo left, theme toggle + hamburger right — no empty center column.
+## 2. Change admin login from `admin` to `admin@genz-s.com`
 
-## 2. About Us active state (`src/components/Navbar.tsx`)
-
-Currently "About Us" is a plain `<a href="/#about">`, so the router keeps the active style on "Home" even while viewing the About section. Fix:
-
-- Track active section with a small scroll listener that sets `activeSection` to `"about"` when `#about` is in view (top < 120px, bottom > 120px), otherwise `"home"`.
-- Apply the active styles (`text-foreground bg-accent`) to Home or About Us based on `activeSection`, and stop relying on `activeProps` for Home.
-- Same logic mirrored in the mobile menu items.
-
-## 3. Restore previous hero (`src/routes/index.tsx`)
-
-Revert the hero heading to **"Join the GenZ's Team"** (keep the highlighted-word treatment on "GenZ's Team"). Keep the current eyebrow ("CAREERS AT GENZ'S"), supporting paragraph, and single Apply Now button. Update the route `head()` title/og accordingly (e.g. `Join the GenZ's Team — Careers at GenZ's`).
-
-## 4. About GenZ's section — shorter, no em dashes (`src/routes/index.tsx`)
-
-Rewrite the left column copy to be tighter and remove every `—`. Proposed 3 short paragraphs:
-
-- "GenZ's was created to redefine fashion for the next generation."
-- "What started as a simple question about why we wear what we wear has grown into one of Egypt's destinations for local fashion. We see style as a way to express identity, creativity, and confidence."
-- "By bringing Egyptian brands together in one place, we make it easier to discover distinctive, high-quality pieces while supporting local designers, creators, and manufacturers."
-
-Also scrub em dashes from the Mission and Vision card bodies (replace with commas or periods) and from any other homepage copy.
-
-## Files touched
-
-- `src/components/Navbar.tsx` — mobile layout + active-section tracking for Home / About Us.
-- `src/routes/index.tsx` — restored hero heading, updated head meta, shortened About copy, no `—`.
+- `src/routes/signin.tsx`: replace the hard-coded `email === "admin"` check with `email.trim().toLowerCase() === "admin@genz-s.com"` (password still `admin`). Update the placeholder/help text hint if one is shown.
+- `src/hooks/use-session.ts`: widen the admin session `email` type from the literal `"admin"` to `string` (or `"admin@genz-s.com"`) and update `signInAdmin` accordingly.
+- Search for any other references to the `"admin"` literal (navbar, admin route guard) and update them to the new email.
 
 ## Out of scope
 
-Auth, admin, applicant portal, footer, styles.css, routes structure.
+Styling overhaul, auth backend, other routes.
