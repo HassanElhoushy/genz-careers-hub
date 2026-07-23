@@ -40,8 +40,22 @@ async function hydrate(session: SupabaseSession | null) {
     setState({ session: null, user: null, role: null, loading: false });
     return;
   }
-  const role = await fetchRole(session.user.id);
-  setState({ session, user: session.user, role, loading: false });
+
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) {
+    await supabase.auth.signOut();
+    setState({ session: null, user: null, role: null, loading: false });
+    return;
+  }
+
+  const role = await fetchRole(userData.user.id);
+  if (!role) {
+    await supabase.auth.signOut();
+    setState({ session: null, user: null, role: null, loading: false });
+    return;
+  }
+
+  setState({ session, user: userData.user, role, loading: false });
 }
 
 if (typeof window !== "undefined") {
