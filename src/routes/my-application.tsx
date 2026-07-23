@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { CalendarClock, CheckCircle2, Clock3, MapPin, XCircle } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, MapPin, Video, XCircle } from "lucide-react";
 
 import { SiteLayout } from "@/layouts/SiteLayout";
 import { Button } from "@/components/ui/button";
