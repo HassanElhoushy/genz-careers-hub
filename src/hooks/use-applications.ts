@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getApplicantEmails } from "@/lib/admin-applications.functions";
 import type { Application, ApplicationStatus, Interview } from "@/types/application";
+
 
 type ApplicationRow = {
   id: string;
