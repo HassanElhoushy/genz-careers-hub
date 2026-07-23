@@ -343,10 +343,18 @@ function AdminPage() {
       <EditDialog
         application={editing}
         onClose={() => setEditing(null)}
-        onSave={(id, patch) => {
-          update(id, patch);
-          toast.success("Saved.");
-          setEditing(null);
+        onSave={async (id, patch) => {
+          try {
+            await updateMutation.mutateAsync({
+              id,
+              interview: patch.interview ?? undefined,
+              rejectionReason: patch.rejectionReason,
+            });
+            toast.success("Saved.");
+            setEditing(null);
+          } catch (e) {
+            toast.error("Save failed", { description: (e as Error).message });
+          }
         }}
       />
     </SiteLayout>
