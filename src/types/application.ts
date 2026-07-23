@@ -1,10 +1,16 @@
 export type ApplicationStatus = "pending" | "accepted" | "rejected";
 
+export type InterviewType = "onsite" | "online";
+
 export type Interview = {
+  type: InterviewType;
   date: string; // ISO date (yyyy-mm-dd)
   time: string; // HH:mm
-  location: string;
+  // On-site
+  location?: string;
   locationUrl?: string;
+  // Online
+  meetingUrl?: string;
   notes?: string;
 };
 
