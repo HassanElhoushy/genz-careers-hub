@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getApplicantEmails } from "@/lib/admin-applications.functions";
 import type { Application, ApplicationStatus, Interview } from "@/types/application";
 
 
@@ -26,12 +25,12 @@ type ProfileRow = {
   name: string | null;
   phone: string | null;
   birthday: string | null;
+  email: string | null;
 };
 
 function toApplication(
   row: ApplicationRow,
   profile: ProfileRow | null,
-  email: string,
 ): Application {
   const interview: Interview | undefined = row.interview_date
     ? {
@@ -49,7 +48,7 @@ function toApplication(
     id: row.id,
     userId: row.user_id,
     name: profile?.name ?? "",
-    email,
+    email: profile?.email ?? "",
     phone: profile?.phone ?? "",
     birthday: profile?.birthday ?? "",
     position: row.position,
@@ -80,12 +79,11 @@ export function useMyApplication(userId: string | null | undefined) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, name, phone, birthday")
+        .select("id, name, phone, birthday, email")
         .eq("id", userId)
         .maybeSingle();
 
-      const { data: userData } = await supabase.auth.getUser();
-      return toApplication(appRow as ApplicationRow, profile as ProfileRow | null, userData.user?.email ?? "");
+      return toApplication(appRow as ApplicationRow, profile as ProfileRow | null);
     },
   });
 }
@@ -107,27 +105,21 @@ export function useAllApplications(enabled: boolean) {
       const ids = (apps ?? []).map((a) => a.user_id);
       if (ids.length === 0) return [];
 
-      const [{ data: profiles }, emailMap] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("id, name, phone, birthday")
-          .in("id", ids),
-        getApplicantEmails().catch(() => ({}) as Record<string, string>),
-      ]);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, name, phone, birthday, email")
+        .in("id", ids);
 
       const profileById = new Map<string, ProfileRow>();
       (profiles ?? []).forEach((p) => profileById.set(p.id, p as ProfileRow));
 
       return (apps ?? []).map((a) =>
-        toApplication(
-          a as ApplicationRow,
-          profileById.get(a.user_id) ?? null,
-          emailMap[a.user_id] ?? "",
-        ),
+        toApplication(a as ApplicationRow, profileById.get(a.user_id) ?? null),
       );
     },
   });
 }
+
 
 
 // ---------------------------------------------------------------------------
