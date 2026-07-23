@@ -29,8 +29,8 @@ export const Route = createFileRoute("/signin")({
 });
 
 const schema = z.object({
-  email: z.string().trim().min(1, "Enter your email"),
-  password: z.string().min(1, "Enter your password"),
+  email: z.string().trim().email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormValues = z.infer<typeof schema>;
