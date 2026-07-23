@@ -105,9 +105,9 @@ function AdminPage() {
     setPage(1);
   }, [query, positionFilter, statusFilter]);
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (userId: string, name: string) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync(userId);
       toast.success(`Removed ${name}`);
     } catch (e) {
       toast.error("Delete failed", { description: (e as Error).message });
