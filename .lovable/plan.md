@@ -1,49 +1,23 @@
-## Problem
+## Change
 
-Deleting an application in the admin dashboard only removes the `applications` row. The `auth.users` account (and cascaded `profiles` / `user_roles`) stays, so the person can still sign in ("No application on file") and can't re-apply ("email already exists").
+Update the portfolio/LinkedIn input label in the apply form from:
 
-## Fix — SQL RPC, no service-role key
+> Portfolio, LinkedIn, or any professional link (optional)
 
-### 1. Migration: `delete_applicant(target_user_id uuid)`
+to:
 
-```sql
-create or replace function public.delete_applicant(target_user_id uuid)
-returns void
-language plpgsql
-security definer
-set search_path = public, auth
-as $$
-begin
-  if not public.has_role(auth.uid(), 'admin') then
-    raise exception 'Only admins can delete applicants';
-  end if;
+> Portfolio or LinkedIn (Optional)
 
-  if public.has_role(target_user_id, 'admin') then
-    raise exception 'Cannot delete an admin account';
-  end if;
+## File to edit
 
-  delete from auth.users where id = target_user_id;
-end;
-$$;
+- `src/routes/apply.tsx` — line containing the `FloatingField` label for the portfolio/LinkedIn input.
 
-revoke all on function public.delete_applicant(uuid) from public, anon;
-grant execute on function public.delete_applicant(uuid) to authenticated;
-```
+## Scope
 
-`ON DELETE CASCADE` from `auth.users` already clears `profiles`, `user_roles`, and `applications`.
+Only the visible label text changes. No logic, validation, or other UI changes.
 
-### 2. Frontend: `src/hooks/use-applications.ts`
+## Verification
 
-Change `useDeleteApplication` to accept the applicant's `userId` and call:
-
-```ts
-const { error } = await supabase.rpc("delete_applicant", { target_user_id: userId });
-```
-
-Invalidate `["all-applications"]` on success.
-
-### 3. Admin UI: `src/routes/admin.tsx`
-
-Pass `application.userId` to the delete mutation (instead of `application.id`). Update the confirm dialog copy to say the applicant account will be removed and the email freed for reapplication.
-
-No changes to applicant pages. No server function, no service-role key — works on Vercel.
+- Open `/apply`.
+- Confirm the input label now reads "Portfolio or LinkedIn (Optional)".
+- Confirm the field still accepts and submits the same data.
