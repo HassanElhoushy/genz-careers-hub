@@ -47,7 +47,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { useApplications } from "@/hooks/use-applications";
+import { useAllApplications, useUpdateApplication, useDeleteApplication } from "@/hooks/use-applications";
 import { useSession } from "@/hooks/use-session";
 import { POSITIONS } from "@/lib/positions";
 import type { Application, ApplicationStatus } from "@/types/application";
