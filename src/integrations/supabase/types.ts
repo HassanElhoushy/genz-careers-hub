@@ -135,10 +135,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      reclaim_orphan_applicant_account: {
-        Args: { target_email: string }
-        Returns: boolean
-      }
     }
     Enums: {
       app_role: "admin" | "applicant"
