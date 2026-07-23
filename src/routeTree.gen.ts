@@ -14,6 +14,7 @@ import { Route as MyApplicationRouteImport } from './routes/my-application'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiSeedAdminRouteImport } from './routes/api/seed-admin'
 
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSeedAdminRoute = ApiSeedAdminRouteImport.update({
+  id: '/api/seed-admin',
+  path: '/api/seed-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/apply': typeof ApplyRoute
   '/my-application': typeof MyApplicationRoute
   '/signin': typeof SigninRoute
+  '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/apply': typeof ApplyRoute
   '/my-application': typeof MyApplicationRoute
   '/signin': typeof SigninRoute
+  '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,33 @@ export interface FileRoutesById {
   '/apply': typeof ApplyRoute
   '/my-application': typeof MyApplicationRoute
   '/signin': typeof SigninRoute
+  '/api/seed-admin': typeof ApiSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/apply' | '/my-application' | '/signin'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/apply'
+    | '/my-application'
+    | '/signin'
+    | '/api/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/apply' | '/my-application' | '/signin'
-  id: '__root__' | '/' | '/admin' | '/apply' | '/my-application' | '/signin'
+  to:
+    | '/'
+    | '/admin'
+    | '/apply'
+    | '/my-application'
+    | '/signin'
+    | '/api/seed-admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/apply'
+    | '/my-application'
+    | '/signin'
+    | '/api/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +105,7 @@ export interface RootRouteChildren {
   ApplyRoute: typeof ApplyRoute
   MyApplicationRoute: typeof MyApplicationRoute
   SigninRoute: typeof SigninRoute
+  ApiSeedAdminRoute: typeof ApiSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/seed-admin': {
+      id: '/api/seed-admin'
+      path: '/api/seed-admin'
+      fullPath: '/api/seed-admin'
+      preLoaderRoute: typeof ApiSeedAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApplyRoute: ApplyRoute,
   MyApplicationRoute: MyApplicationRoute,
   SigninRoute: SigninRoute,
+  ApiSeedAdminRoute: ApiSeedAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
