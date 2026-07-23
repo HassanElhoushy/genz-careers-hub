@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { CalendarIcon, ExternalLink, Inbox, Pencil, Search, Trash2 } from "lucide-react";
+import { CalendarIcon, ExternalLink, Inbox, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteLayout } from "@/layouts/SiteLayout";
