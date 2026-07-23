@@ -269,7 +269,7 @@ function AdminPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="inline-flex items-center gap-1">
-                            <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
+                            <DeleteButton onConfirm={() => handleDelete(a.userId, a.name)} />
                           </div>
                         </TableCell>
                       </TableRow>
