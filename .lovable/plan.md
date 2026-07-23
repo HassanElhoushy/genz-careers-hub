@@ -1,25 +1,49 @@
-## Why emails vanish on Vercel
+## Problem
 
-Emails live in `auth.users`, which the browser can't read. Locally we work around that with a server function (`getApplicantEmails`) that uses the admin service-role key to call `auth.admin.listUsers`.
+Deleting an application in the admin dashboard only removes the `applications` row. The `auth.users` account (and cascaded `profiles` / `user_roles`) stays, so the person can still sign in ("No application on file") and can't re-apply ("email already exists").
 
-On Vercel the same server function runs, but the required server env vars (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) aren't set there, so the function throws and the client falls back to `""` — every Email cell renders as `—`. The service-role key for Lovable Cloud isn't retrievable, so we can't simply "paste it into Vercel".
+## Fix — SQL RPC, no service-role key
 
-## Fix: put email on `profiles` and read it like any other column
+### 1. Migration: `delete_applicant(target_user_id uuid)`
 
-1. **Migration**
-   - Add `email text` column to `public.profiles`.
-   - Update `handle_new_user()` trigger to also insert `new.email` into `profiles.email` on signup.
-   - Backfill: `update public.profiles p set email = u.email from auth.users u where u.id = p.id and p.email is null;`
-   - No RLS change needed — existing profile policies already gate access (own row or admin).
+```sql
+create or replace function public.delete_applicant(target_user_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+begin
+  if not public.has_role(auth.uid(), 'admin') then
+    raise exception 'Only admins can delete applicants';
+  end if;
 
-2. **Frontend**
-   - `src/hooks/use-applications.ts`: select `email` from `profiles` in both `useMyApplication` and `useAllApplications`, and use `profile.email` in `toApplication` instead of calling `getApplicantEmails` / `supabase.auth.getUser().email`. Remove the `Promise.all` email-map merge.
-   - Delete `src/lib/admin-applications.functions.ts` (no longer needed).
+  if public.has_role(target_user_id, 'admin') then
+    raise exception 'Cannot delete an admin account';
+  end if;
 
-3. **Result**
-   - Emails render on Vercel, preview, and localhost with no server-only secret required.
-   - No UI changes — same Email column and mobile card line.
+  delete from auth.users where id = target_user_id;
+end;
+$$;
 
-## Out of scope
+revoke all on function public.delete_applicant(uuid) from public, anon;
+grant execute on function public.delete_applicant(uuid) to authenticated;
+```
 
-Any other admin/dashboard changes; keeping the admin server function around "just in case".
+`ON DELETE CASCADE` from `auth.users` already clears `profiles`, `user_roles`, and `applications`.
+
+### 2. Frontend: `src/hooks/use-applications.ts`
+
+Change `useDeleteApplication` to accept the applicant's `userId` and call:
+
+```ts
+const { error } = await supabase.rpc("delete_applicant", { target_user_id: userId });
+```
+
+Invalidate `["all-applications"]` on success.
+
+### 3. Admin UI: `src/routes/admin.tsx`
+
+Pass `application.userId` to the delete mutation (instead of `application.id`). Update the confirm dialog copy to say the applicant account will be removed and the email freed for reapplication.
+
+No changes to applicant pages. No server function, no service-role key — works on Vercel.

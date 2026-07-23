@@ -105,9 +105,9 @@ function AdminPage() {
     setPage(1);
   }, [query, positionFilter, statusFilter]);
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (userId: string, name: string) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync(userId);
       toast.success(`Removed ${name}`);
     } catch (e) {
       toast.error("Delete failed", { description: (e as Error).message });
@@ -269,7 +269,7 @@ function AdminPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="inline-flex items-center gap-1">
-                            <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
+                            <DeleteButton onConfirm={() => handleDelete(a.userId, a.name)} />
                           </div>
                         </TableCell>
                       </TableRow>
@@ -300,7 +300,7 @@ function AdminPage() {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
+                        <DeleteButton onConfirm={() => handleDelete(a.userId, a.name)} />
                       </div>
                     </div>
                     <div className="mt-3 flex items-center gap-2">
@@ -388,9 +388,9 @@ function DeleteButton({ onConfirm }: { onConfirm: () => void }) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this application?</AlertDialogTitle>
+          <AlertDialogTitle>Delete this applicant?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently remove the submission from your local device.
+            This permanently removes the applicant's account, profile, and application. Their email will be free to apply again.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
