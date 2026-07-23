@@ -1,39 +1,43 @@
 ## Goal
 
-Restore access to `admin@genz-s.com`, add a proper password reset flow, and surface clearer sign-in errors so this class of issue doesn't recur.
+Drop the password-reset flow, wipe and reseed `admin@genz-s.com` with password `admin`, and relax the sign-in password minimum for that one email.
 
-## 1. Reset the admin account
+## 1. Remove password reset flow
 
-Delete the existing `admin@genz-s.com` auth user (cascades to `profiles`, `user_roles`, `applications`) so you can register fresh at `/apply` with a valid password (min 6 chars). The DB trigger `handle_new_user` will re-grant the admin role automatically on re-signup.
+- Delete `src/routes/forgot-password.tsx` and `src/routes/reset-password.tsx`.
+- In `src/routes/signin.tsx`, remove the "Forgot password?" link block (the `<div className="flex justify-end -mt-2">…</div>`).
+- `src/routeTree.gen.ts` regenerates automatically from the file-based router — no manual edit.
 
-## 2. Add a "Forgot password" flow
+## 2. Reseed the admin user
 
-- Add a **Forgot password?** link on `/signin`.
-- New public route `/forgot-password`: email input, calls `supabase.auth.resetPasswordForEmail(email, { redirectTo: ${origin}/reset-password })`.
-- New public route `/reset-password`: detects the `type=recovery` hash, shows a new-password form, calls `supabase.auth.updateUser({ password })`, then redirects to `/signin`.
-- Both pages use the existing `SiteLayout` + floating-label field styling from `signin.tsx`.
+Supabase Auth users can't be created from a SQL migration (the `auth` schema is managed and password hashing lives in GoTrue). I'll do it via a one-off TanStack server function that uses `supabaseAdmin`:
 
-## 3. Improve sign-in error messages
+- Look up any existing user with email `admin@genz-s.com` via `auth.admin.listUsers` and delete it with `auth.admin.deleteUser` (cascades to `profiles`, `user_roles`, `applications` via FK).
+- Recreate with `auth.admin.createUser({ email: 'admin@genz-s.com', password: 'admin', email_confirm: true })`.
+- The existing `handle_new_user` trigger will insert the `profiles` row and grant the `admin` role automatically (it already special-cases this email).
+- I'll invoke the function once from the sandbox to perform the reseed, then leave the file in place (harmless, admin-guarded) or delete it — your call. Default: delete after use so it isn't a live endpoint.
 
-Update `src/routes/signin.tsx` to map Supabase auth errors instead of the generic string:
-- `invalid_credentials` → "Wrong email or password."
-- `email_not_confirmed` → "Please confirm your email first."
-- Network/other → show the raw message.
+Note: Supabase's default password policy requires min 6 chars. `admin` is 5. I'll relax the project's password minimum to 5 via `supabase--configure_auth` so the Admin API accepts it (and so subsequent sign-in works). This is a project-wide change — every user could then pick a 5-char password. Confirm you're OK with that; otherwise the only alternative is to use a 6+ char admin password.
 
-Also add a client-side min-length hint (6 chars) on the password field so the same 5-character mistake is caught before the request.
+## 3. Client-side validation exception
 
-## 4. Auth email templates
+In `src/routes/signin.tsx`, replace the flat Zod schema with a `superRefine` (or a discriminated check) so:
+- If `email === 'admin@genz-s.com'` → password must be ≥ 5 chars.
+- Otherwise → password must be ≥ 6 chars.
 
-Password reset relies on Supabase sending a recovery email. I'll scaffold the Lovable auth email templates (`email_domain--scaffold_auth_email_templates`) so the recovery email actually delivers with GenZ's branding. If no email domain is set up yet, I'll surface the email setup dialog first.
+Apply-form signup schema is left alone (new users still need 6+).
 
 ## Files touched
 
-- `src/routes/signin.tsx` — error mapping + "Forgot password?" link
-- `src/routes/forgot-password.tsx` *(new)*
-- `src/routes/reset-password.tsx` *(new)*
-- Delete admin auth user via admin API (server-side, one-off)
-- Scaffold auth email templates
+- Delete: `src/routes/forgot-password.tsx`, `src/routes/reset-password.tsx`
+- Edit: `src/routes/signin.tsx` (remove link, adjust schema)
+- New (temporary): `src/lib/seed-admin.functions.ts` — server fn using `supabaseAdmin` to delete+recreate the admin user; invoked once, then removed
+- Config: lower auth `minimum_password_length` to 5
 
 ## Out of scope
 
-No schema changes, no changes to the admin panel, applicant portal, or application form.
+Any other auth, admin panel, or applicant flow changes.
+
+## Question before I build
+
+Are you OK lowering the project-wide password minimum to 5 characters so `admin`/`admin` works? If not, I'll keep the min at 6 and reseed the admin with a 6-char password of your choice instead.

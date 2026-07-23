@@ -28,10 +28,25 @@ export const Route = createFileRoute("/signin")({
   component: SignInPage,
 });
 
-const schema = z.object({
-  email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+const ADMIN_EMAIL = "admin@genz-s.com";
+const schema = z
+  .object({
+    email: z.string().trim().email("Enter a valid email"),
+    password: z.string().min(1, "Password is required"),
+  })
+  .superRefine((val, ctx) => {
+    const min = val.email.trim().toLowerCase() === ADMIN_EMAIL ? 5 : 6;
+    if (val.password.length < min) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.too_small,
+        minimum: min,
+        type: "string",
+        inclusive: true,
+        path: ["password"],
+        message: `Password must be at least ${min} characters`,
+      });
+    }
+  });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -147,14 +162,6 @@ function SignInPage() {
                 {...register("password")}
               />
 
-              <div className="flex justify-end -mt-2">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs font-medium text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
 
               {error && (
                 <p className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">

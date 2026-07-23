@@ -10,9 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as MyApplicationRouteImport } from './routes/my-application'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,19 +20,9 @@ const SigninRoute = SigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MyApplicationRoute = MyApplicationRouteImport.update({
   id: '/my-application',
   path: '/my-application',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplyRoute = ApplyRouteImport.update({
@@ -57,18 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
-  '/forgot-password': typeof ForgotPasswordRoute
   '/my-application': typeof MyApplicationRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
-  '/forgot-password': typeof ForgotPasswordRoute
   '/my-application': typeof MyApplicationRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRoutesById {
@@ -76,48 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
-  '/forgot-password': typeof ForgotPasswordRoute
   '/my-application': typeof MyApplicationRoute
-  '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/admin'
-    | '/apply'
-    | '/forgot-password'
-    | '/my-application'
-    | '/reset-password'
-    | '/signin'
+  fullPaths: '/' | '/admin' | '/apply' | '/my-application' | '/signin'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/apply'
-    | '/forgot-password'
-    | '/my-application'
-    | '/reset-password'
-    | '/signin'
-  id:
-    | '__root__'
-    | '/'
-    | '/admin'
-    | '/apply'
-    | '/forgot-password'
-    | '/my-application'
-    | '/reset-password'
-    | '/signin'
+  to: '/' | '/admin' | '/apply' | '/my-application' | '/signin'
+  id: '__root__' | '/' | '/admin' | '/apply' | '/my-application' | '/signin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ApplyRoute: typeof ApplyRoute
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
   MyApplicationRoute: typeof MyApplicationRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
   SigninRoute: typeof SigninRoute
 }
 
@@ -130,25 +88,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/my-application': {
       id: '/my-application'
       path: '/my-application'
       fullPath: '/my-application'
       preLoaderRoute: typeof MyApplicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apply': {
@@ -179,9 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApplyRoute: ApplyRoute,
-  ForgotPasswordRoute: ForgotPasswordRoute,
   MyApplicationRoute: MyApplicationRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
   SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport
