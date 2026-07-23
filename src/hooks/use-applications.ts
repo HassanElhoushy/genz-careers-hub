@@ -185,8 +185,8 @@ export function useUpdateApplication() {
 export function useDeleteApplication() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("applications").delete().eq("id", id);
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase.rpc("delete_applicant", { target_user_id: userId });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["all-applications"] }),
