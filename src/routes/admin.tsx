@@ -300,13 +300,6 @@ function AdminPage() {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => setEditing(a)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                          aria-label="Edit"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
                         <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
                       </div>
                     </div>
