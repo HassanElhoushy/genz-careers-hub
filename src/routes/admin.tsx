@@ -71,8 +71,10 @@ const PAGE_SIZE = 8;
 function AdminPage() {
   const navigate = useNavigate();
   const session = useSession();
-  const { applications, update, remove } = useApplications();
-  const [loading, setLoading] = useState(true);
+  const isAdmin = session.role === "admin";
+  const { data: applications = [], isLoading } = useAllApplications(isAdmin);
+  const updateMutation = useUpdateApplication();
+  const deleteMutation = useDeleteApplication();
   const [query, setQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -80,18 +82,14 @@ function AdminPage() {
   const [editing, setEditing] = useState<Application | null>(null);
 
   useEffect(() => {
-    if (!session) navigate({ to: "/signin" });
+    if (session.loading) return;
+    if (!session.user) navigate({ to: "/signin" });
     else if (session.role !== "admin") navigate({ to: "/my-application" });
   }, [session, navigate]);
 
-  useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 300);
-    return () => clearTimeout(t);
-  }, []);
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return applications.filter((a) => {
+    return applications.filter((a: Application) => {
       if (q && !`${a.name} ${a.email} ${a.phone}`.toLowerCase().includes(q)) return false;
       if (positionFilter !== "all" && a.position !== positionFilter) return false;
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
@@ -107,26 +105,38 @@ function AdminPage() {
     setPage(1);
   }, [query, positionFilter, statusFilter]);
 
-  const handleDelete = (id: string, name: string) => {
-    remove(id);
-    toast.success(`Removed ${name}`);
+  const handleDelete = async (id: string, name: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success(`Removed ${name}`);
+    } catch (e) {
+      toast.error("Delete failed", { description: (e as Error).message });
+    }
   };
 
-  const handleStatusChange = (a: Application, status: ApplicationStatus) => {
-    update(a.id, { status });
-    toast.success(`${a.name} → ${status}`);
-    if (status !== "pending") setEditing({ ...a, status });
+  const handleStatusChange = async (a: Application, status: ApplicationStatus) => {
+    try {
+      await updateMutation.mutateAsync({ id: a.id, status });
+      toast.success(`${a.name} → ${status}`);
+      if (status !== "pending") setEditing({ ...a, status });
+    } catch (e) {
+      toast.error("Update failed", { description: (e as Error).message });
+    }
   };
 
-  if (!session || session.role !== "admin") {
+  if (session.loading || !session.user || session.role !== "admin") {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-md px-4 py-24 text-center">
-          <p className="text-sm text-muted-foreground">Redirecting…</p>
+          <p className="text-sm text-muted-foreground">
+            {session.loading ? "Loading…" : "Redirecting…"}
+          </p>
         </div>
       </SiteLayout>
     );
   }
+
+  const loading = isLoading;
 
   return (
     <SiteLayout>
