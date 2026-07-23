@@ -292,9 +292,20 @@ function AdminPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="truncate text-base font-semibold">{a.name}</p>
-                        <p className="truncate text-sm text-muted-foreground">{a.email}</p>
+                        <p className="truncate text-sm text-muted-foreground">{a.email || "—"}</p>
                         <p className="mt-1 text-xs text-primary">{a.position}</p>
+                        {a.portfolioUrl && (
+                          <a
+                            href={a.portfolioUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                          >
+                            Portfolio <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
                       </div>
+
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => setEditing(a)}
