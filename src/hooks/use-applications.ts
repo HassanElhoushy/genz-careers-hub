@@ -137,7 +137,15 @@ export function useUpdateApplication() {
       interview?: Interview | null;
       rejectionReason?: string | null;
     }) => {
-      const patch: Record<string, unknown> = {};
+      const patch: {
+        status?: ApplicationStatus;
+        interview_date?: string | null;
+        interview_time?: string | null;
+        interview_location?: string | null;
+        interview_location_url?: string | null;
+        interview_notes?: string | null;
+        rejection_reason?: string | null;
+      } = {};
       if (status !== undefined) patch.status = status;
       if (interview !== undefined) {
         if (interview === null) {
