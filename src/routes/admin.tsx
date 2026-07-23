@@ -232,11 +232,26 @@ function AdminPage() {
                       <TableRow key={a.id}>
                         <TableCell className="font-medium">{a.name}</TableCell>
                         <TableCell className="text-muted-foreground">{a.position}</TableCell>
-                        <TableCell className="text-muted-foreground">{a.email}</TableCell>
+                        <TableCell className="text-muted-foreground">{a.email || "—"}</TableCell>
                         <TableCell className="text-muted-foreground">{a.phone}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {a.portfolioUrl ? (
+                            <a
+                              href={a.portfolioUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-primary hover:underline"
+                            >
+                              View <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            "—"
+                          )}
+                        </TableCell>
                         <TableCell className="text-muted-foreground">
                           {format(new Date(a.submittedAt), "PP")}
                         </TableCell>
+
                         <TableCell>
                           <Select
                             value={a.status}
