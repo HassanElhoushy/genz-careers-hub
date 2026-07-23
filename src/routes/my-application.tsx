@@ -140,27 +140,61 @@ function MyApplicationPage() {
                 {app.interview ? (
                   <div className="mt-5 grid gap-4 sm:grid-cols-2">
                     <InterviewRow
+                      icon={
+                        app.interview.type === "online" ? (
+                          <Video className="h-4 w-4" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )
+                      }
+                      label="Interview type"
+                      value={app.interview.type === "online" ? "Online" : "On-site"}
+                    />
+                    <InterviewRow
                       icon={<CalendarClock className="h-4 w-4" />}
                       label="Date & Time"
                       value={`${format(new Date(app.interview.date), "PPP")} · ${app.interview.time}`}
                     />
-                    <div className="rounded-2xl border border-border bg-background p-4">
-                      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        Location
+
+                    {app.interview.type === "onsite" ? (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
+                        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          Location
+                        </div>
+                        <p className="mt-1.5 text-sm font-medium">{app.interview.location}</p>
+                        {app.interview.locationUrl && (
+                          <a
+                            href={app.interview.locationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                          >
+                            <MapPin className="h-3.5 w-3.5" />
+                            Open Location
+                          </a>
+                        )}
                       </div>
-                      <p className="mt-1.5 text-sm font-medium">{app.interview.location}</p>
-                      {app.interview.locationUrl && (
-                        <a
-                          href={app.interview.locationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                        >
-                          📍 Open in Google Maps
-                        </a>
-                      )}
-                    </div>
+                    ) : (
+                      app.interview.meetingUrl && (
+                        <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
+                          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                            <Video className="h-4 w-4" />
+                            Meeting link
+                          </div>
+                          <a
+                            href={app.interview.meetingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                          >
+                            <Video className="h-3.5 w-3.5" />
+                            Join Meeting
+                          </a>
+                        </div>
+                      )
+                    )}
+
                     {app.interview.notes && (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
                         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
