@@ -442,6 +442,19 @@ function EditDialog({
           </DialogTitle>
           <DialogDescription>
             {application.name} · {application.position}
+            {application.linkedinUrl && (
+              <>
+                {" · "}
+                <a
+                  href={application.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary hover:underline"
+                >
+                  🔗 Portfolio
+                </a>
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
 
