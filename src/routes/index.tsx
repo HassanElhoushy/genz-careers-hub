@@ -76,7 +76,7 @@ function Index() {
               className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold tracking-widest text-primary uppercase"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              Careers at GenZ's
+              We are hiring now!
             </motion.span>
 
             <motion.h1
@@ -97,9 +97,8 @@ function Index() {
               custom={2}
               className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg"
             >
-              Join a team bringing together fashion, creativity, community, and technology
-              to help Egyptian brands grow and give the next generation new ways to
-              express themselves.
+              Build your future with one of Egypt's fastest-growing fashion brands and
+              collaborate with creative minds to build the future of fashion.
             </motion.p>
 
             <motion.div
