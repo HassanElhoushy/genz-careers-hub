@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { CalendarClock, CheckCircle2, Clock3, MapPin, XCircle } from "lucide-react";
@@ -7,7 +7,7 @@ import { CalendarClock, CheckCircle2, Clock3, MapPin, XCircle } from "lucide-rea
 import { SiteLayout } from "@/layouts/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useApplications } from "@/hooks/use-applications";
+import { useMyApplication } from "@/hooks/use-applications";
 import { sessionStore, useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/my-application")({
@@ -27,26 +27,21 @@ export const Route = createFileRoute("/my-application")({
 function MyApplicationPage() {
   const navigate = useNavigate();
   const session = useSession();
-  const { applications } = useApplications();
+  const { data: app, isLoading } = useMyApplication(session.user?.id);
 
   useEffect(() => {
-    if (!session) navigate({ to: "/signin" });
+    if (session.loading) return;
+    if (!session.user) navigate({ to: "/signin" });
     else if (session.role === "admin") navigate({ to: "/admin" });
   }, [session, navigate]);
 
-  const app = useMemo(
-    () =>
-      session?.role === "applicant"
-        ? applications.find((a) => a.email.toLowerCase() === session.email.toLowerCase())
-        : undefined,
-    [applications, session],
-  );
-
-  if (!session || session.role !== "applicant") {
+  if (session.loading || !session.user || session.role === "admin") {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-md px-4 py-24 text-center">
-          <p className="text-sm text-muted-foreground">Redirecting…</p>
+          <p className="text-sm text-muted-foreground">
+            {session.loading || isLoading ? "Loading…" : "Redirecting…"}
+          </p>
         </div>
       </SiteLayout>
     );
@@ -104,9 +99,9 @@ function MyApplicationPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     Submitted {format(new Date(app.submittedAt), "PPP")}
                   </p>
-                  {app.linkedinUrl && (
+                  {app.portfolioUrl && (
                     <a
-                      href={app.linkedinUrl}
+                      href={app.portfolioUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"

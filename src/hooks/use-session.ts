@@ -1,54 +1,81 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
+import type { Session as SupabaseSession, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
-export type Session =
-  | { role: "admin"; email: string }
-  | { role: "applicant"; email: string }
-  | null;
+export type Role = "admin" | "applicant";
 
-const STORAGE_KEY = "genz_session";
+export type SessionState = {
+  session: SupabaseSession | null;
+  user: User | null;
+  role: Role | null;
+  loading: boolean;
+};
 
-function load(): Session {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && (parsed.role === "admin" || parsed.role === "applicant")) {
-      return parsed as Session;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
+const initialState: SessionState = {
+  session: null,
+  user: null,
+  role: null,
+  loading: true,
+};
 
-let state: Session = typeof window !== "undefined" ? load() : null;
+let state: SessionState = initialState;
 const listeners = new Set<() => void>();
 
-function setState(next: Session) {
-  state = next;
-  if (typeof window !== "undefined") {
-    if (next) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    else window.localStorage.removeItem(STORAGE_KEY);
-  }
+function setState(next: Partial<SessionState>) {
+  state = { ...state, ...next };
   listeners.forEach((l) => l());
 }
 
-const subscribe = (cb: () => void) => {
-  listeners.add(cb);
-  return () => {
-    listeners.delete(cb);
-  };
-};
+async function fetchRole(userId: string): Promise<Role | null> {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data.role as Role;
+}
+
+async function hydrate(session: SupabaseSession | null) {
+  if (!session?.user) {
+    setState({ session: null, user: null, role: null, loading: false });
+    return;
+  }
+  const role = await fetchRole(session.user.id);
+  setState({ session, user: session.user, role, loading: false });
+}
+
+let bootstrapped = false;
+function bootstrap() {
+  if (bootstrapped || typeof window === "undefined") return;
+  bootstrapped = true;
+
+  supabase.auth.getSession().then(({ data }) => hydrate(data.session));
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    hydrate(session);
+  });
+}
 
 export const sessionStore = {
   get: () => state,
-  signInAdmin: () => setState({ role: "admin", email: "admin@genz-s.com" }),
-  signInApplicant: (email: string) =>
-    setState({ role: "applicant", email: email.trim().toLowerCase() }),
-  signOut: () => setState(null),
+  signOut: async () => {
+    await supabase.auth.signOut();
+    setState({ session: null, user: null, role: null, loading: false });
+  },
 };
 
-export function useSession(): Session {
-  return useSyncExternalStore(subscribe, () => state, () => null);
+export function useSession(): SessionState {
+  bootstrap();
+  const [snapshot, setSnapshot] = useState(state);
+  useEffect(() => {
+    const cb = () => setSnapshot(state);
+    listeners.add(cb);
+    // resync in case state changed between render and effect
+    cb();
+    return () => {
+      listeners.delete(cb);
+    };
+  }, []);
+  return snapshot;
 }

@@ -22,7 +22,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { useApplications } from "@/hooks/use-applications";
+import { supabase } from "@/integrations/supabase/client";
 import { POSITIONS } from "@/lib/positions";
 
 export const Route = createFileRoute("/apply")({
@@ -58,7 +58,7 @@ const schema = z.object({
     .regex(/[A-Z]/, "Include an uppercase letter")
     .regex(/[a-z]/, "Include a lowercase letter")
     .regex(/[0-9]/, "Include a number"),
-  linkedinUrl: z
+  portfolioUrl: z
     .string()
     .trim()
     .max(200, "URL too long")
@@ -107,7 +107,6 @@ function FloatingField({
 
 function ApplyPage() {
   const navigate = useNavigate();
-  const add = useApplications((s) => s.add);
   const [success, setSuccess] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
 
@@ -120,34 +119,69 @@ function ApplyPage() {
     reset,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", password: "", linkedinUrl: "", position: "" },
+    defaultValues: { name: "", email: "", phone: "", password: "", portfolioUrl: "", position: "" },
   });
 
   const birthday = watch("birthday");
   const position = watch("position");
 
   const onSubmit = async (data: FormValues) => {
-    await new Promise((r) => setTimeout(r, 500));
-    const result = add({
-      name: data.name,
+    const portfolio = data.portfolioUrl?.trim() || undefined;
+    const birthdayIso = data.birthday.toISOString().slice(0, 10);
+
+    // 1) Create the auth user; profile + role are created by DB trigger
+    const { data: signUp, error: signUpErr } = await supabase.auth.signUp({
       email: data.email,
-      phone: data.phone,
       password: data.password,
-      linkedinUrl: data.linkedinUrl?.trim() || undefined,
-      position: data.position,
-      birthday: data.birthday.toISOString(),
+      options: {
+        emailRedirectTo: `${window.location.origin}/signin`,
+        data: {
+          name: data.name,
+          phone: data.phone,
+          birthday: birthdayIso,
+          portfolio_url: portfolio ?? "",
+        },
+      },
     });
-    if (!result.ok) {
-      toast.error("An account with this email already exists.", {
-        description: "Try signing in instead.",
-      });
+
+    if (signUpErr) {
+      const msg = signUpErr.message.toLowerCase();
+      if (msg.includes("registered") || msg.includes("exists")) {
+        toast.error("An account with this email already exists.", {
+          description: "Try signing in instead.",
+        });
+      } else {
+        toast.error("Couldn't create your account.", { description: signUpErr.message });
+      }
       return;
     }
+
+    const userId = signUp.user?.id;
+    if (!userId) {
+      toast.error("Signup succeeded but no user was returned. Please try signing in.");
+      return;
+    }
+
+    // 2) Insert the application row (RLS: auth.uid() = user_id, which is now set by signIn below)
+    // With auto-confirm on, signUp already returns a session, so auth.uid() matches user_id.
+    const { error: insertErr } = await supabase.from("applications").insert({
+      user_id: userId,
+      position: data.position,
+      portfolio_url: portfolio ?? null,
+    });
+
+    if (insertErr) {
+      toast.error("Couldn't save your application.", { description: insertErr.message });
+      return;
+    }
+
     setSuccess(true);
     toast.success("Account created!", {
       description: "Sign in to track your application.",
     });
     reset();
+    // Sign out so the sign-in page becomes the next explicit step.
+    await supabase.auth.signOut();
     setTimeout(() => {
       setSuccess(false);
       navigate({ to: "/signin" });
@@ -231,11 +265,11 @@ function ApplyPage() {
                 {...register("password")}
               />
               <FloatingField
-                label="LinkedIn or portfolio URL (optional)"
+                label="Portfolio, LinkedIn, or any professional link (optional)"
                 type="url"
                 autoComplete="url"
-                error={errors.linkedinUrl?.message}
-                {...register("linkedinUrl")}
+                error={errors.portfolioUrl?.message}
+                {...register("portfolioUrl")}
               />
 
               {/* Position combobox */}
