@@ -300,7 +300,7 @@ function AdminPage() {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <DeleteButton onConfirm={() => handleDelete(a.id, a.name)} />
+                        <DeleteButton onConfirm={() => handleDelete(a.userId, a.name)} />
                       </div>
                     </div>
                     <div className="mt-3 flex items-center gap-2">
