@@ -220,9 +220,11 @@ function AdminPage() {
                       <TableHead>Position</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
+                      <TableHead>Portfolio</TableHead>
                       <TableHead>Submitted</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-24 text-right">Actions</TableHead>
+
                     </TableRow>
                   </TableHeader>
                   <TableBody>
