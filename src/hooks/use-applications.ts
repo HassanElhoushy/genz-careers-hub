@@ -35,10 +35,12 @@ function toApplication(
 ): Application {
   const interview: Interview | undefined = row.interview_date
     ? {
+        type: (row.interview_type as "onsite" | "online") ?? "onsite",
         date: row.interview_date,
         time: row.interview_time ?? "",
-        location: row.interview_location ?? "",
+        location: row.interview_location ?? undefined,
         locationUrl: row.interview_location_url ?? undefined,
+        meetingUrl: row.interview_meeting_url ?? undefined,
         notes: row.interview_notes ?? undefined,
       }
     : undefined;
