@@ -56,15 +56,15 @@ function buildSchema(minAgeDate: Date) {
       .regex(/[A-Z]/, "Include an uppercase letter")
       .regex(/[a-z]/, "Include a lowercase letter")
       .regex(/[0-9]/, "Include a number"),
-    portfolioUrl: z.preprocess(
-      (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-      z
-        .string()
-        .trim()
-        .max(200, "URL too long")
-        .url("Enter a valid URL (include https://)")
-        .optional(),
-    ),
+    portfolioUrl: z
+      .string()
+      .trim()
+      .max(200, "URL too long")
+      .refine(
+        (v) => v === "" || /^https?:\/\/\S+\.\S+/i.test(v),
+        "Enter a valid URL (include https://)",
+      )
+      .optional(),
     position: z.string().min(1, "Pick a position"),
     birthday: z
       .date({ required_error: "Pick your birthday" })
@@ -72,15 +72,7 @@ function buildSchema(minAgeDate: Date) {
   });
 }
 
-type FormValues = {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  portfolioUrl?: string;
-  position: string;
-  birthday: Date;
-};
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 function FloatingField({
   label,
