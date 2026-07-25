@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -107,7 +107,6 @@ function FloatingField({
 }
 
 function ApplyPage() {
-  const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
 
@@ -136,7 +135,7 @@ function ApplyPage() {
     const portfolio = data.portfolioUrl?.trim() || undefined;
     const birthdayIso = data.birthday.toISOString().slice(0, 10);
 
-    // 1) Create the auth user; profile + role are created by DB trigger
+    // 1) Create the auth user; profile + role + application are created by DB trigger
     const { data: signUp, error: signUpErr } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -170,17 +169,50 @@ function ApplyPage() {
       return;
     }
 
+    // 2) Confirm the trigger-created application row is visible before proceeding
+    let inserted = false;
+    for (let i = 0; i < 6; i++) {
+      const { data: row } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (row?.id) {
+        inserted = true;
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 300));
+    }
+
+    if (!inserted) {
+      toast.error("We couldn't confirm your application yet.", {
+        description: "Please sign in in a moment to see its status.",
+      });
+    }
+
+    // 3) Sign out and wait for the SIGNED_OUT event to propagate
+    await new Promise<void>((resolve) => {
+      const timeout = setTimeout(() => resolve(), 1500);
+      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_OUT") {
+          clearTimeout(timeout);
+          sub.subscription.unsubscribe();
+          resolve();
+        }
+      });
+      void supabase.auth.signOut();
+    });
+
     setSuccess(true);
-    toast.success("Account created!", {
+    toast.success("Application submitted successfully!", {
       description: "Sign in to track your application.",
     });
     reset();
-    // Sign out so the sign-in page becomes the next explicit step.
-    await supabase.auth.signOut();
+
+    // 4) Hard-navigate so /signin mounts with a fresh signed-out snapshot
     setTimeout(() => {
-      setSuccess(false);
-      navigate({ to: "/signin" });
-    }, 1400);
+      window.location.assign("/signin");
+    }, 800);
   };
 
   return (
