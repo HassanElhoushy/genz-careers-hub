@@ -89,20 +89,35 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       }
     );
 
-    const { data, error } = await supabase.auth.getClaims(token);
-    if (error || !data?.claims) {
-      throw new Error('Unauthorized: Invalid token');
+    let userId: string | undefined;
+    let claims: Record<string, unknown> | undefined;
+
+    try {
+      const { data, error } = await supabase.auth.getClaims(token);
+      if (!error && data?.claims?.sub) {
+        userId = data.claims.sub as string;
+        claims = data.claims as Record<string, unknown>;
+      }
+    } catch {
+      // fall through to getUser fallback
     }
 
-    if (!data.claims.sub) {
-      throw new Error('Unauthorized: No user ID found in token');
+    if (!userId) {
+      // Fallback: validate the bearer token against Supabase Auth directly.
+      // Works with the publishable key and doesn't require the service role.
+      const { data: userData, error: userError } = await supabase.auth.getUser(token);
+      if (userError || !userData?.user?.id) {
+        throw new Error('Unauthorized: Invalid or expired session');
+      }
+      userId = userData.user.id;
+      claims = { sub: userId, email: userData.user.email };
     }
 
     return next({
       context: {
         supabase,
-        userId: data.claims.sub,
-        claims: data.claims,
+        userId,
+        claims,
       },
     });
   },

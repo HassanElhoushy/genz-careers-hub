@@ -11,7 +11,19 @@ export type SessionState = {
   loading: boolean;
 };
 
-let state: SessionState = {
+// Stable, frozen snapshot returned during SSR so concurrent server requests
+// never share or leak a mutable session store.
+const SERVER_SNAPSHOT: SessionState = Object.freeze({
+  session: null,
+  user: null,
+  role: null,
+  loading: true,
+});
+
+const isBrowser = typeof window !== "undefined";
+
+// Browser-only mutable state. On the server we return SERVER_SNAPSHOT.
+let browserState: SessionState = {
   session: null,
   user: null,
   role: null,
@@ -19,9 +31,10 @@ let state: SessionState = {
 };
 
 const listeners = new Set<() => void>();
+let initialized = false;
 
 function setState(next: Partial<SessionState>) {
-  state = { ...state, ...next };
+  browserState = { ...browserState, ...next };
   listeners.forEach((l) => l());
 }
 
@@ -58,7 +71,9 @@ async function hydrate(session: SupabaseSession | null) {
   setState({ session, user: userData.user, role, loading: false });
 }
 
-if (typeof window !== "undefined") {
+function ensureInitialized() {
+  if (!isBrowser || initialized) return;
+  initialized = true;
   supabase.auth.getSession().then(({ data }) => hydrate(data.session));
   supabase.auth.onAuthStateChange((_event, session) => {
     hydrate(session);
@@ -66,6 +81,7 @@ if (typeof window !== "undefined") {
 }
 
 function subscribe(cb: () => void) {
+  ensureInitialized();
   listeners.add(cb);
   return () => {
     listeners.delete(cb);
@@ -73,22 +89,21 @@ function subscribe(cb: () => void) {
 }
 
 function getSnapshot() {
-  return state;
+  return isBrowser ? browserState : SERVER_SNAPSHOT;
 }
 
 function getServerSnapshot() {
-  return state;
+  return SERVER_SNAPSHOT;
 }
 
 export const sessionStore = {
-  get: () => state,
+  get: () => (isBrowser ? browserState : SERVER_SNAPSHOT),
   signOut: async () => {
     await supabase.auth.signOut();
-    setState({ session: null, user: null, role: null, loading: false });
+    // onAuthStateChange will fire and update state via hydrate().
   },
 };
 
 export function useSession(): SessionState {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
-

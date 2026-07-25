@@ -425,8 +425,21 @@ function EditDialog({
   const [notes, setNotes] = useState("");
   const [reason, setReason] = useState("");
 
+  // Reset every field when switching to a different application so
+  // stale values from the previous applicant can never leak in.
+  const applicationId = application?.id;
   useEffect(() => {
-    if (!application) return;
+    if (!applicationId || !application) {
+      setInterviewType("onsite");
+      setDate(undefined);
+      setTime("");
+      setLocation("");
+      setLocationUrl("");
+      setMeetingUrl("");
+      setNotes("");
+      setReason("");
+      return;
+    }
     setInterviewType(application.interview?.type ?? "onsite");
     setDate(application.interview ? new Date(application.interview.date) : undefined);
     setTime(application.interview?.time ?? "");
@@ -435,7 +448,8 @@ function EditDialog({
     setMeetingUrl(application.interview?.meetingUrl ?? "");
     setNotes(application.interview?.notes ?? "");
     setReason(application.rejectionReason ?? "");
-  }, [application]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicationId]);
 
   if (!application) return null;
 
