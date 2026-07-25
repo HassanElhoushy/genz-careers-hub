@@ -28,25 +28,10 @@ export const Route = createFileRoute("/signin")({
   component: SignInPage,
 });
 
-const ADMIN_EMAIL = "admin@genz-s.com";
-const schema = z
-  .object({
-    email: z.string().trim().email("Enter a valid email"),
-    password: z.string().min(1, "Password is required"),
-  })
-  .superRefine((val, ctx) => {
-    const min = val.email.trim().toLowerCase() === ADMIN_EMAIL ? 5 : 6;
-    if (val.password.length < min) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.too_small,
-        minimum: min,
-        type: "string",
-        inclusive: true,
-        path: ["password"],
-        message: `Password must be at least ${min} characters`,
-      });
-    }
-  });
+const schema = z.object({
+  email: z.string().trim().email("Enter a valid email"),
+  password: z.string().min(5, "Password must be at least 5 characters"),
+});
 
 type FormValues = z.infer<typeof schema>;
 

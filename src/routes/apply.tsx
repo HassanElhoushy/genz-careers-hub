@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -42,36 +42,45 @@ export const Route = createFileRoute("/apply")({
   component: ApplyPage,
 });
 
-const today = new Date();
-const minAgeDate = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
+function buildSchema(minAgeDate: Date) {
+  return z.object({
+    name: z.string().trim().min(2, "Name must be at least 2 characters").max(80),
+    email: z.string().trim().email("Enter a valid email").max(120),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^(\+20|0)?1[0125]\d{8}$/, "Enter a valid Egyptian phone number"),
+    password: z
+      .string()
+      .min(8, "At least 8 characters")
+      .regex(/[A-Z]/, "Include an uppercase letter")
+      .regex(/[a-z]/, "Include a lowercase letter")
+      .regex(/[0-9]/, "Include a number"),
+    portfolioUrl: z.preprocess(
+      (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+      z
+        .string()
+        .trim()
+        .max(200, "URL too long")
+        .url("Enter a valid URL (include https://)")
+        .optional(),
+    ),
+    position: z.string().min(1, "Pick a position"),
+    birthday: z
+      .date({ required_error: "Pick your birthday" })
+      .max(minAgeDate, "You must be at least 16"),
+  });
+}
 
-const schema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(80),
-  email: z.string().trim().email("Enter a valid email").max(120),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^(\+20|0)?1[0125]\d{8}$/, "Enter a valid Egyptian phone number"),
-  password: z
-    .string()
-    .min(8, "At least 8 characters")
-    .regex(/[A-Z]/, "Include an uppercase letter")
-    .regex(/[a-z]/, "Include a lowercase letter")
-    .regex(/[0-9]/, "Include a number"),
-  portfolioUrl: z
-    .string()
-    .trim()
-    .max(200, "URL too long")
-    .url("Enter a valid URL (include https://)")
-    .optional()
-    .or(z.literal("")),
-  position: z.string().min(1, "Pick a position"),
-  birthday: z
-    .date({ required_error: "Pick your birthday" })
-    .max(minAgeDate, "You must be at least 16"),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  portfolioUrl?: string;
+  position: string;
+  birthday: Date;
+};
 
 function FloatingField({
   label,
@@ -109,6 +118,12 @@ function ApplyPage() {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
+
+  const minAgeDate = useMemo(() => {
+    const t = new Date();
+    return new Date(t.getFullYear() - 16, t.getMonth(), t.getDate());
+  }, []);
+  const schema = useMemo(() => buildSchema(minAgeDate), [minAgeDate]);
 
   const {
     register,
