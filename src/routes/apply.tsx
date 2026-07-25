@@ -107,7 +107,7 @@ function FloatingField({
 }
 
 function ApplyPage() {
-  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
   const [success, setSuccess] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
 
