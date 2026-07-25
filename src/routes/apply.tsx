@@ -108,7 +108,6 @@ function FloatingField({
 
 function ApplyPage() {
   const [success, setSuccess] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [positionOpen, setPositionOpen] = useState(false);
 
   const minAgeDate = useMemo(() => {
