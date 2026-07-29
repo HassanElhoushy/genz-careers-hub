@@ -99,16 +99,19 @@ function MyApplicationPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     Submitted {format(new Date(app.submittedAt), "PPP")}
                   </p>
-                  {app.portfolioUrl && (
-                    <a
-                      href={app.portfolioUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                    >
-                      🔗 View your portfolio
-                    </a>
-                  )}
+                  {(() => {
+                    const safe = safeHttpUrl(app.portfolioUrl);
+                    return safe ? (
+                      <a
+                        href={safe}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                      >
+                        🔗 View your portfolio
+                      </a>
+                    ) : null;
+                  })()}
                 </div>
                 <StatusBadge status={app.status} />
               </div>

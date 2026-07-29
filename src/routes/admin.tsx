@@ -235,18 +235,21 @@ function AdminPage() {
                         <TableCell className="text-muted-foreground">{a.email || "—"}</TableCell>
                         <TableCell className="text-muted-foreground">{a.phone}</TableCell>
                         <TableCell className="text-muted-foreground">
-                          {a.portfolioUrl ? (
-                            <a
-                              href={a.portfolioUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-primary hover:underline"
-                            >
-                              View <ExternalLink className="h-3 w-3" />
-                            </a>
-                          ) : (
-                            "—"
-                          )}
+                          {(() => {
+                            const safe = safeHttpUrl(a.portfolioUrl);
+                            return safe ? (
+                              <a
+                                href={safe}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-primary hover:underline"
+                              >
+                                View <ExternalLink className="h-3 w-3" />
+                              </a>
+                            ) : (
+                              "—"
+                            );
+                          })()}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {format(new Date(a.submittedAt), "PP")}
@@ -287,16 +290,19 @@ function AdminPage() {
                         <p className="truncate text-base font-semibold">{a.name}</p>
                         <p className="truncate text-sm text-muted-foreground">{a.email || "—"}</p>
                         <p className="mt-1 text-xs text-primary">{a.position}</p>
-                        {a.portfolioUrl && (
-                          <a
-                            href={a.portfolioUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                          >
-                            Portfolio <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
+                        {(() => {
+                          const safe = safeHttpUrl(a.portfolioUrl);
+                          return safe ? (
+                            <a
+                              href={safe}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            >
+                              Portfolio <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : null;
+                        })()}
                       </div>
 
                       <div className="flex items-center gap-1">
@@ -516,19 +522,22 @@ function EditDialog({
           </DialogTitle>
           <DialogDescription>
             {application.name} · {application.position}
-            {application.portfolioUrl && (
-              <>
-                {" · "}
-                <a
-                  href={application.portfolioUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-primary hover:underline"
-                >
-                  🔗 Portfolio
-                </a>
-              </>
-            )}
+            {(() => {
+              const safe = safeHttpUrl(application.portfolioUrl);
+              return safe ? (
+                <>
+                  {" · "}
+                  <a
+                    href={safe}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    🔗 Portfolio
+                  </a>
+                </>
+              ) : null;
+            })()}
           </DialogDescription>
         </DialogHeader>
 
