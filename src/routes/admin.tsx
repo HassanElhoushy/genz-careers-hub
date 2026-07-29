@@ -51,6 +51,7 @@ import { useAllApplications, useUpdateApplication, useDeleteApplication } from "
 import { useSession } from "@/hooks/use-session";
 import { POSITIONS } from "@/lib/positions";
 import type { Application, ApplicationStatus } from "@/types/application";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({

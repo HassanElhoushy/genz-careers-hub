@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMyApplication } from "@/hooks/use-applications";
 import { sessionStore, useSession } from "@/hooks/use-session";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 export const Route = createFileRoute("/my-application")({
   head: () => ({
