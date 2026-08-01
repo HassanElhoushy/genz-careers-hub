@@ -167,36 +167,42 @@ function MyApplicationPage() {
                           Location
                         </div>
                         <p className="mt-1.5 text-sm font-medium">{app.interview.location}</p>
-                        {app.interview.locationUrl && (
-                          <a
-                            href={app.interview.locationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
-                          >
-                            <MapPin className="h-3.5 w-3.5" />
-                            Open Location
-                          </a>
-                        )}
+                        {(() => {
+                          const safe = safeHttpUrl(app.interview.locationUrl);
+                          return safe ? (
+                            <a
+                              href={safe}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                            >
+                              <MapPin className="h-3.5 w-3.5" />
+                              Open Location
+                            </a>
+                          ) : null;
+                        })()}
                       </div>
                     ) : (
-                      app.interview.meetingUrl && (
-                        <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
-                          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                            <Video className="h-4 w-4" />
-                            Meeting link
+                      (() => {
+                        const safe = safeHttpUrl(app.interview.meetingUrl);
+                        return safe ? (
+                          <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-4">
+                            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                              <Video className="h-4 w-4" />
+                              Meeting link
+                            </div>
+                            <a
+                              href={safe}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                            >
+                              <Video className="h-3.5 w-3.5" />
+                              Join Meeting
+                            </a>
                           </div>
-                          <a
-                            href={app.interview.meetingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
-                          >
-                            <Video className="h-3.5 w-3.5" />
-                            Join Meeting
-                          </a>
-                        </div>
-                      )
+                        ) : null;
+                      })()
                     )}
 
                     {app.interview.notes && (
