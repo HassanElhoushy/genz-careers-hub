@@ -127,6 +127,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_auth_email: { Args: never; Returns: string }
       delete_applicant: { Args: { target_user_id: string }; Returns: undefined }
       has_role: {
         Args: {
